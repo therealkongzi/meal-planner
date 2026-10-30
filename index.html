@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dinners">
+<meta name="theme-color" content="#14171c">
+<meta name="description" content="Plan family dinners for the week, build a shopping list, and see estimated macros.">
+<title>Family Dinners</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{--bg:#14171c;--card:#1e232b;--card2:#272d37;--line:#343b47;--text:#eef1f5;--dim:#9aa4b2;--acc:#f0a030;--ok:#3fb7a3;--bad:#e5534b;--r:14px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:17px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 84px)}
+header{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);min-height:58px}
+header h1{font-size:20px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{padding:14px;max-width:640px;margin:0 auto}
+button,.btn{font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:12px;min-height:46px;padding:0 16px;cursor:pointer}
+button:active{opacity:.7}button:disabled{opacity:.4}
+.pri{background:var(--acc);color:#111;border-color:var(--acc);font-weight:600}
+.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
+.ghost{background:transparent;border-color:transparent;color:var(--dim)}
+.sm{min-height:38px;padding:0 12px;font-size:15px;border-radius:10px}
+.full{width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.day{cursor:pointer;min-height:76px}
+.day.today{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.dlabel{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.t2{font-size:19px;font-weight:600}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--acc);color:#111;margin-left:6px;vertical-align:middle;text-transform:none;letter-spacing:0}
+.pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--card2);color:var(--dim);margin:4px 4px 0 0}
+.dim{color:var(--dim)}.small{font-size:14px}.tiny{font-size:12px}.center{text-align:center}
+.okc{color:var(--ok);font-weight:600}.warn{color:#ffd08a}
+input,textarea,select{font:inherit;font-size:17px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;min-height:46px;padding:8px 10px;width:100%}
+select{-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),linear-gradient(135deg,var(--dim) 50%,transparent 50%);background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:26px}
+input::placeholder,textarea::placeholder{color:#6d7684}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--acc);border-color:transparent}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>.grow,.grow{flex:1}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;background:#0e1014;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;border:0;border-radius:0;background:transparent;min-height:60px;color:var(--dim);padding:0 2px;font-size:15px}
+nav.tabs button.on{color:var(--acc);font-weight:600}
+.list>button,.list>.card{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px 14px;min-height:64px}
+.seg{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}.seg button{flex:1;padding:0 8px;min-width:0}.seg button.on{background:var(--acc);color:#111;border-color:var(--acc);font-weight:600}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
+.chip{min-height:40px;padding:0 14px;font-size:15px;border-radius:99px}
+.chip.on{background:var(--ok);border-color:var(--ok);color:#111;font-weight:600}
+label.f{display:block;font-size:14px;color:var(--dim);margin:12px 0 4px}
+h2{font-size:15px;margin:20px 0 8px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 66px);transform:translateX(-50%);background:var(--ok);color:#111;padding:10px 16px;border-radius:10px;font-weight:600;z-index:20;max-width:90vw;text-align:center}
+.weeknav{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.weeknav>button{width:52px;padding:0;font-size:24px}
+.step{width:44px;padding:0;font-size:22px}
+.sv{min-width:30px;text-align:center;font-size:18px}
+.mac{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0}
+.mac div{background:var(--card2);border-radius:10px;padding:8px 4px;text-align:center}
+.mac b{display:block;font-size:18px;color:var(--acc)}
+.mac span{font-size:12px;color:var(--dim)}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--dim);font-weight:500}td.n,th.n{text-align:right}
+ul.ing{padding:0;margin:0;list-style:none}ul.ing li{padding:9px 0;border-bottom:1px solid var(--line)}ul.ing li b{display:inline-block;min-width:84px;color:var(--acc);font-weight:600}
+ol.steps{padding-left:22px;margin:0}ol.steps li{margin-bottom:10px}
+.ingrow{border-top:1px solid var(--line);padding:10px 0}
+.ingrow .q{width:84px;flex:none}.ingrow select{width:118px;flex:none}
+.acw{position:relative;margin-top:8px}
+.ac{position:absolute;left:0;right:0;top:100%;z-index:8;background:var(--card2);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 8px 24px #000a}
+.ac:empty{display:none}
+.ac button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;min-height:46px;font-size:16px}
+.ist{margin-top:6px;min-height:20px}
+.item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.item .txt{flex:1;min-width:0}
+.item.done .txt{opacity:.5;text-decoration:line-through}
+.chk{width:48px;height:48px;min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-size:22px;padding:0;color:transparent;flex:none}
+.chk.on{background:var(--ok);border-color:var(--ok);color:#111}
+.x{width:44px;padding:0;flex:none;color:var(--dim);background:transparent;border-color:transparent;font-size:20px}
+.note{font-size:14px;color:#cfe9e4;background:#173430;border-radius:10px;padding:10px 12px;margin:8px 0}
+.estl{font-size:12px;font-weight:700;color:#111;background:#ffd08a;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle;letter-spacing:0;text-transform:none}
+textarea.copy{font-size:14px}
+</style>
+</head>
+<body>
+<header><button id="backBtn" class="ghost sm" style="display:none">‹ Back</button><h1 id="title">Dinners</h1><span id="hdrRight"></span></header>
+<main id="app"></main>
+<nav class="tabs" id="tabs"></nav>
+<script>
+const ING_RAW=`
+Chicken breast, boneless skinless|me|120|22.5|0|2.6|0|pc:200
+Chicken thigh, boneless skinless|me|121|19.7|0|4.1|0|pc:110
+Chicken thigh, bone-in skin-on|me|221|16|0|17|0|pc:130
+Chicken drumstick|me|161|18.1|0|9.2|0|pc:75
+Chicken wings|me|203|17.5|0|14.2|0|pc:32
+Whole chicken|me|215|18.6|0|15.1|0|pc:1100
+Ground chicken|me|143|17.4|0|8.1|0|
+Chicken breast, cooked|me|165|31|0|3.6|0|pc:170,cup:140
+Rotisserie chicken meat|me|190|29|0|7.4|0|pc:600,cup:140
+Chicken liver|me|119|16.9|0.7|4.8|0|pc:45
+Ground turkey 93/7|me|150|18.7|0|8.3|0|
+Ground turkey 85/15|me|213|16.9|0|15.6|0|
+Turkey breast, deli sliced|me|104|17|4|1.7|0|slice:28
+Ground beef 90/10|me|176|20|0|10|0|
+Ground beef 93/7|me|152|20.9|0|7|0|
+Ground beef 85/15|me|215|18.6|0|15|0|
+Ground beef 80/20|me|254|17.2|0|20|0|
+Beef sirloin steak|me|160|21|0|8|0|pc:250
+Flank steak|me|155|21.2|0|7.2|0|pc:700
+Beef chuck roast|me|196|19|0|13|0|
+Beef stew meat|me|140|21|0|6|0|
+Ribeye steak|me|248|19|0|19|0|pc:300
+Beef brisket|me|214|19|0|15|0|
+Beef shank|me|150|21|0|7|0|*
+Oxtail|me|230|19|0|17|0|*
+Pork shoulder (kasim)|me|220|17|0|16.5|0|
+Pork belly (liempo)|me|518|9.3|0|53|0|
+Pork loin chop|me|172|21|0|9.6|0|pc:170
+Pork tenderloin|me|120|20.7|0|3.5|0|pc:450
+Ground pork|me|263|16.9|0|21.2|0|
+Pork spare ribs|me|277|15.5|0|23.4|0|
+Bacon|me|417|13|1.4|40|0|slice:25,pc:25
+Ham, sliced|me|163|16.6|3.8|8.6|0|slice:28
+Mexican chorizo|me|455|24.1|1.9|38.3|0|pc:75
+Italian sausage|me|346|14.3|0.6|31.3|0|pc:85
+Hot dog|me|290|10|4|26|0|pc:50
+Longganisa (sweet sausage)|me|340|15|15|25|0|pc:40,*
+Pork tocino|me|260|16|15|15|0|*
+Corned beef, canned|pa|250|27|0|15|0|can:340
+Luncheon meat (Spam)|pa|315|13|3|27|0|can:340,slice:56
+Milkfish (bangus)|me|148|20.5|0|6.7|0|pc:400
+Tilapia fillet|me|96|20.1|0|1.7|0|pc:120
+Salmon fillet|me|208|20.4|0|13.4|0|pc:170
+Cod fillet|me|82|17.8|0|0.7|0|pc:170
+Tuna steak|me|109|24.4|0|0.5|0|pc:170
+Tuna, canned in water (drained)|pa|116|25.5|0|0.8|0|can:120
+Sardines, canned in tomato sauce|pa|186|20.9|0.5|10.5|0|can:155
+Shrimp, raw|me|85|20.1|0.9|0.5|0|pc:12
+Shrimp, frozen raw|fr|85|20.1|0.9|0.5|0|pc:12
+Squid|me|92|15.6|3.1|1.4|0|
+Mussels|me|86|11.9|3.7|2.2|0|
+Tofu, firm|me|144|17.3|2.8|8.7|2.3|pc:400,cup:250
+Tofu, regular|me|76|8.1|1.9|4.8|0.3|pc:400,cup:248
+Eggs|da|143|12.6|0.7|9.5|0|pc:50,cup:243
+Egg whites|da|52|10.9|0.7|0.2|0|pc:33,cup:243
+Milk, whole|da|61|3.2|4.8|3.3|0|cup:244
+Milk, 2%|da|50|3.3|4.8|2|0|cup:244
+Milk, skim|da|34|3.4|5|0.1|0|cup:245
+Evaporated milk|pa|134|6.8|10|7.6|0|cup:252,can:370
+Sweetened condensed milk|pa|321|7.9|54.4|8.7|0|cup:306,can:397
+Coconut milk, canned|pa|197|2|2.8|21.3|0|cup:226,can:400
+Coconut cream|pa|330|3.6|6.7|34.7|2.2|cup:240,can:400
+Heavy cream|da|340|2.8|2.7|36|0|cup:238
+Sour cream|da|198|2.4|4.6|19.4|0|cup:230
+Greek yogurt, plain nonfat|da|59|10.2|3.6|0.4|0|cup:245
+Greek yogurt, plain whole|da|97|9|4|5|0|cup:245
+Plain yogurt|da|61|3.5|4.7|3.3|0|cup:245
+Butter|da|717|0.9|0.1|81|0|cup:227,pc:113
+Cheddar cheese|da|403|24.9|1.3|33.1|0|cup:113,slice:21
+Mozzarella, part-skim|da|254|24.3|2.8|15.9|0|cup:112,slice:28
+Monterey Jack cheese|da|373|24.5|0.7|30.3|0|cup:113,slice:28
+Mexican blend cheese, shredded|da|372|23.5|1.8|30|0|cup:113
+Parmesan, grated|da|420|28.4|13.9|27.8|0|cup:100
+Cottage cheese, 2%|da|81|10.5|4.8|2.3|0|cup:226
+Cream cheese|da|350|6.2|5.5|34.4|0|cup:232,pc:226
+Feta cheese|da|264|14.2|4.1|21.3|0|cup:150
+Queso fresco / kesong puti|da|299|18|3|24|0|cup:122
+Cotija cheese|da|366|20|4|30|0|cup:113,*
+Processed cheese (Eden / American)|da|330|16|8|26|0|slice:21,pc:165,cup:113,*
+White rice, uncooked|pa|365|7.1|80|0.7|1.3|cup:185
+Jasmine rice, uncooked|pa|360|7|79|0.6|1|cup:185
+White rice, cooked|pa|130|2.7|28.2|0.3|0.4|cup:158
+Brown rice, uncooked|pa|370|7.9|77.2|2.9|3.5|cup:185
+Brown rice, cooked|pa|123|2.7|25.6|1|1.6|cup:195
+Pasta, dry|pa|371|13|74.7|1.5|3.2|cup:100,pc:450
+Whole wheat pasta, dry|pa|352|14.6|71|2.5|8|cup:100
+Egg noodles, dry|pa|384|14.2|71.3|4.4|3.3|cup:38
+Rice noodles (bihon), dry|pa|364|6|80|0.6|1.6|cup:50
+Canton noodles, dry|pa|380|12|75|4|2|cup:50,*
+Glass noodles (sotanghon), dry|pa|351|0.2|86|0.1|0.5|cup:50
+Couscous, dry|pa|376|12.8|77.4|0.6|5|cup:173
+Quinoa, dry|pa|368|14.1|64.2|6.1|7|cup:170
+Rolled oats|pa|379|13.2|67.7|6.5|10.1|cup:81
+All-purpose flour|pa|364|10.3|76.3|1|2.7|cup:125
+Cornstarch|pa|381|0.3|91.3|0.1|0.9|cup:128
+Breadcrumbs, plain|pa|395|13.4|71.9|5.3|4.5|cup:108
+Panko breadcrumbs|pa|360|12|74|2|3|cup:50
+Flour tortillas|ot|306|8.2|50.3|7.8|3.5|pc:45
+Corn tortillas|ot|218|5.7|44.6|2.9|6.3|pc:26
+Taco shells, hard|pa|468|7.2|62.4|22.6|5|pc:13
+Tortilla chips|pa|489|7.8|63|23.4|5.3|cup:28
+White bread|ot|266|7.6|49.4|3.3|2.7|slice:28,pc:28
+Whole wheat bread|ot|254|12.3|43.1|3.6|6|slice:32,pc:32
+Hamburger buns|ot|279|9.5|49.4|4.3|2|pc:52
+Hot dog buns|ot|279|9.5|49.4|4.3|2|pc:44
+Pandesal|ot|290|8|52|5|2|pc:30,*
+Pita bread|ot|275|9.1|55.7|1.2|2.2|pc:60
+Naan|ot|291|9.6|50|5.7|2.2|pc:90
+Pizza dough|ot|250|8|47|3.2|1.8|pc:350,*
+Lumpia wrappers|ot|290|9|58|1.5|2|pc:12,*
+Wonton wrappers|ot|291|9.8|57.9|1.5|1.8|pc:8
+Potatoes|pr|77|2|17.5|0.1|2.2|pc:213,cup:150
+Red potatoes|pr|70|1.9|15.9|0.1|1.7|pc:170,cup:150
+Sweet potatoes (kamote)|pr|86|1.6|20.1|0.1|3|pc:130,cup:133
+Taro (gabi)|pr|112|1.5|26.5|0.2|4.1|pc:100,cup:104
+Black beans, cooked or canned|pa|132|8.9|23.7|0.5|8.7|cup:172,can:250
+Pinto beans, cooked or canned|pa|143|9|26.2|0.7|9|cup:171,can:250
+Kidney beans, cooked or canned|pa|127|8.7|22.8|0.5|6.4|cup:177,can:250
+Chickpeas, cooked or canned|pa|164|8.9|27.4|2.6|7.6|cup:164,can:250
+Refried beans, canned|pa|90|5.4|15|1.2|5|cup:250,can:454
+Lentils, dry|pa|352|24.6|63.4|1.1|10.7|cup:192
+Lentils, cooked|pa|116|9|20.1|0.4|7.9|cup:198
+Mung beans (monggo), dry|pa|347|23.9|62.6|1.2|16.3|cup:207
+Peanut butter|pa|588|25|20|50|6|cup:256
+Peanuts|pa|567|25.8|16.1|49.2|8.5|cup:146
+Almonds|pa|579|21.2|21.6|49.9|12.5|cup:143
+Cashews|pa|553|18.2|30.2|43.9|3.3|cup:137
+Sesame seeds|pa|573|17.7|23.4|49.7|11.8|cup:144
+Raisins|pa|299|3.1|79.2|0.5|3.7|cup:145
+Olive oil|pa|884|0|0|100|0|cup:216
+Vegetable oil|pa|884|0|0|100|0|cup:218
+Sesame oil|pa|884|0|0|100|0|cup:218
+Coconut oil|pa|892|0|0|99|0|cup:218
+White sugar|pa|387|0|100|0|0|cup:200
+Brown sugar|pa|380|0.1|98.1|0|0|cup:220
+Honey|pa|304|0.3|82.4|0|0.2|cup:339
+Maple syrup|pa|260|0|67|0.1|0|cup:315
+Soy sauce|pa|53|8.1|4.9|0.6|0.8|cup:255
+Oyster sauce|pa|51|1.4|10.9|0.3|0.3|cup:288
+Fish sauce (patis)|pa|35|5.1|3.6|0|0|cup:288
+Vinegar|pa|18|0|0|0|0|cup:238
+Shrimp paste (bagoong)|pa|160|14|10|7|0|cup:290,*
+Sinigang (tamarind) soup mix|pa|350|2|80|3|1|pc:22,*
+Liver spread|pa|230|10|8|18|0|can:85,*
+Lime juice|pr|25|0.4|8.4|0.1|0.4|cup:242
+Lemon juice|pr|22|0.4|6.9|0.2|0.3|cup:244
+Calamansi juice|pr|25|0.4|8.4|0.1|0.4|cup:242,*
+Orange juice|ot|45|0.7|10.4|0.2|0.2|cup:248
+Ketchup|pa|101|1|27.4|0.1|0.3|cup:272
+Banana ketchup|pa|110|0.5|27|0.2|0.5|cup:272,*
+Mayonnaise|pa|680|1|0.6|75|0|cup:220
+Yellow mustard|pa|60|3.7|5.8|3.3|4|cup:250
+BBQ sauce|pa|172|0.8|40.8|0.6|0.9|cup:286
+Hot sauce|pa|11|0.5|1.8|0.4|0.3|cup:240
+Sriracha|pa|93|1.9|19.2|0.9|2.2|cup:270
+Salsa, jarred|pa|36|1.5|7|0.2|1.9|cup:259
+Enchilada sauce|pa|30|0.9|5|0.9|1|cup:250,can:283,*
+Green chiles, canned|pa|21|0.7|4.6|0.3|1.7|can:113,cup:139
+Diced tomatoes with green chiles|pa|20|0.9|4|0.1|1|can:283,cup:240
+Tomato sauce|pa|24|1.2|5.3|0.3|1.5|cup:245,can:425,pc:250
+Tomato paste|pa|82|4.3|18.9|0.5|4.1|cup:262,can:170
+Diced tomatoes, canned|pa|21|1|4.5|0.2|1.2|cup:240,can:411
+Marinara / pasta sauce|pa|50|1.4|8|1.5|1.8|cup:250,pc:680
+Filipino-style sweet spaghetti sauce|pa|70|1|15|1|1|cup:250,pc:1000,*
+Chicken broth|pa|6|0.6|0.4|0.2|0|cup:240,can:411
+Beef broth|pa|7|1.1|0.1|0.2|0|cup:240,can:411
+Bouillon cube|pa|300|10|30|15|0|pc:10,*
+Teriyaki sauce|pa|89|5.9|15.6|0|0.1|cup:288
+Hoisin sauce|pa|220|3.3|44.1|3.4|2.8|cup:258
+Sweet chili sauce|pa|230|0.4|56|0.4|0.6|cup:290,*
+Worcestershire sauce|pa|78|0|19.5|0|0|cup:275
+Pesto|pa|470|5|6|47|1.5|cup:250,pc:190,*
+Hummus|ot|166|7.9|14.3|9.6|6|cup:246
+Black olives|pa|115|0.8|6|10.7|3.2|cup:134,can:170
+Pineapple chunks, canned|pa|60|0.4|15.7|0.1|0.8|cup:249,can:567
+Salt|pa|0|0|0|0|0|cup:288
+Black pepper|pa|251|10.4|64|3.3|25.3|cup:110
+Ground cumin|pa|375|17.8|44.2|22.3|10.5|cup:100
+Chili powder|pa|282|13.5|49.7|14.3|34.8|cup:128
+Paprika|pa|282|14.1|54|13|34.9|cup:110
+Garlic powder|pa|331|16.6|72.7|0.7|9|cup:150
+Onion powder|pa|341|10.4|79|1|15.2|cup:115
+Dried oregano|pa|265|9|68.9|4.3|42.5|cup:48
+Italian seasoning|pa|265|9|68.9|4.3|42.5|cup:48
+Ground cinnamon|pa|247|4|80.6|1.2|53.1|cup:125
+Curry powder|pa|325|14.3|55.8|14|53.2|cup:100
+Taco seasoning|pa|322|6|56|5|12|cup:128,pc:28,*
+Bay leaves|pa|313|7.6|75|8.4|26.3|pc:0.2
+Red pepper flakes|pa|318|12|56.6|17.3|27.2|cup:90
+Ground ginger|pa|335|9|71.6|4.2|14.1|cup:90
+Baking powder|pa|53|0|27.7|0|0.2|cup:220
+Water|ot|0|0|0|0|0|cup:240
+Onion|pr|40|1.1|9.3|0.1|1.7|pc:110,cup:160
+Red onion|pr|40|1.1|9.3|0.1|1.7|pc:110,cup:160
+Shallots|pr|72|2.5|16.8|0.1|3.2|pc:30,cup:160
+Green onions|pr|32|1.8|7.3|0.2|2.6|pc:15,stalk:15,cup:100,bunch:100
+Garlic|pr|149|6.4|33.1|0.5|2.1|clove:3,pc:40,cup:136
+Ginger, fresh|pr|80|1.8|17.8|0.8|2|pc:15,cup:96
+Lemongrass|pr|99|1.8|25.3|0.5|0|pc:20,stalk:20
+Tomatoes|pr|18|0.9|3.9|0.2|1.2|pc:123,cup:180
+Cherry tomatoes|pr|18|0.9|3.9|0.2|1.2|pc:17,cup:149
+Red bell pepper|pr|31|1|6|0.3|2.1|pc:120,cup:149
+Green bell pepper|pr|20|0.9|4.6|0.2|1.7|pc:120,cup:149
+Yellow bell pepper|pr|27|1|6.3|0.2|0.9|pc:120,cup:149
+Jalapeño|pr|29|0.9|6.5|0.4|2.8|pc:14,cup:90
+Poblano pepper|pr|20|0.9|4.6|0.2|1.7|pc:120
+Bird's eye chili (siling labuyo)|pr|40|1.9|8.8|0.4|1.5|pc:3
+Long green chili (siling haba)|pr|40|2|9.5|0.2|1.5|pc:15
+Carrots|pr|41|0.9|9.6|0.2|2.8|pc:61,cup:128
+Celery|pr|14|0.7|3|0.2|1.6|pc:40,stalk:40,cup:101
+Broccoli|pr|34|2.8|6.6|0.4|2.6|pc:300,cup:91
+Cauliflower|pr|25|1.9|5|0.3|2|pc:575,cup:107
+Cabbage|pr|25|1.3|5.8|0.1|2.5|pc:900,cup:70
+Red cabbage|pr|31|1.4|7.4|0.2|2.1|pc:900,cup:70
+Napa cabbage (pechay Baguio)|pr|16|1.2|3.2|0.2|1.2|pc:900,cup:76
+Coleslaw mix|pr|25|1.3|5.8|0.1|2.5|cup:70,pc:400
+Bok choy (pechay)|pr|13|1.5|2.2|0.2|1|pc:250,bunch:250,cup:70
+Spinach|pr|23|2.9|3.6|0.4|2.2|cup:30,bunch:340
+Water spinach (kangkong)|pr|19|2.6|3.1|0.2|2.1|cup:56,bunch:250,pc:250
+Moringa leaves (malunggay)|pr|64|9.4|8.3|1.4|2|cup:21,bunch:50
+Kale|pr|35|2.9|4.4|1.5|4.1|cup:21,bunch:200
+Romaine lettuce|pr|17|1.2|3.3|0.3|2.1|cup:47,pc:626
+Iceberg lettuce|pr|14|0.9|3|0.1|1.2|cup:72,pc:750
+Mixed salad greens|pr|20|1.5|3.3|0.2|2|cup:30,pc:140
+Arugula|pr|25|2.6|3.7|0.7|1.6|cup:20
+Cucumber|pr|15|0.7|3.6|0.1|0.5|pc:300,cup:104
+Zucchini|pr|17|1.2|3.1|0.3|1|pc:200,cup:124
+Eggplant (talong)|pr|25|1|5.9|0.2|3|pc:200,cup:82
+Green beans / string beans (sitaw)|pr|31|1.8|7|0.2|2.7|cup:110
+Snow peas|pr|42|2.8|7.6|0.2|2.6|cup:63
+Okra|pr|33|1.9|7.5|0.2|3.2|pc:12,cup:100
+Bitter melon (ampalaya)|pr|17|1|3.7|0.2|2.8|pc:200,cup:93
+Squash (kalabasa) / butternut|pr|45|1|11.7|0.1|2|cup:140,pc:1000
+Chayote (sayote)|pr|19|0.8|4.5|0.1|1.7|pc:200,cup:132
+Green papaya|pr|43|0.5|10.8|0.3|1.7|pc:500,cup:140
+Radish (labanos) / daikon|pr|18|0.6|4.1|0.1|1.6|pc:340,cup:116
+Jicama (singkamas)|pr|38|0.7|8.8|0.1|4.9|pc:400,cup:130
+Bean sprouts (togue)|pr|30|3|5.9|0.2|1.8|cup:104
+Mushrooms, white|pr|22|3.1|3.3|0.3|1|pc:18,cup:70
+Shiitake mushrooms|pr|34|2.2|6.8|0.5|2.5|pc:19,cup:70
+Sweet corn kernels|pr|86|3.3|19|1.4|2|pc:90,cup:145
+Green peas|pr|81|5.4|14.5|0.4|5.1|cup:145
+Asparagus|pr|20|2.2|3.9|0.1|2.1|pc:16,cup:134,bunch:450
+Avocado|pr|160|2|8.5|14.7|6.7|pc:150,cup:150
+Limes|pr|30|0.7|10.5|0.2|2.8|pc:67
+Lemons|pr|29|1.1|9.3|0.3|2.8|pc:84
+Calamansi|pr|25|0.4|8|0.1|1|pc:15,*
+Oranges|pr|47|0.9|11.8|0.1|2.4|pc:131
+Cilantro|pr|23|2.1|3.7|0.5|2.8|cup:16,bunch:50
+Parsley|pr|36|3|6.3|0.8|3.3|cup:60,bunch:60
+Basil|pr|23|3.2|2.6|0.6|1.6|cup:24,bunch:30
+Saba banana / plantain|pr|122|1.3|31.9|0.4|2.3|pc:80,cup:148
+Bananas|pr|89|1.1|22.8|0.3|2.6|pc:118
+Apples|pr|52|0.3|13.8|0.2|2.4|pc:182
+Mango|pr|60|0.8|15|0.4|1.6|pc:200,cup:165
+Pineapple, fresh|pr|50|0.5|13.1|0.1|1.4|cup:165,pc:900
+Strawberries|pr|32|0.7|7.7|0.3|2|cup:152
+Blueberries|pr|57|0.7|14.5|0.3|2.4|cup:148
+Grapes|pr|69|0.7|18.1|0.2|0.9|cup:151
+Watermelon|pr|30|0.6|7.6|0.2|0.4|cup:152
+Mixed vegetables, frozen|fr|72|3.3|13.5|0.5|4.4|cup:135
+Broccoli, frozen|fr|29|2.8|5.4|0.3|3|cup:91
+Corn, frozen|fr|88|3|20.7|0.8|2.1|cup:136
+Peas, frozen|fr|77|5.2|13.6|0.4|4.5|cup:134
+Peas and carrots, frozen|fr|53|3.4|10.4|0.4|3.4|cup:134
+Stir-fry vegetables, frozen|fr|35|2|7|0.2|2.5|cup:100
+Spinach, frozen|fr|29|3.6|4.8|0.6|2.9|cup:156
+French fries, frozen|fr|150|2.3|24|5|2|cup:80
+Dumplings / potstickers, frozen|fr|220|9|25|9|1.5|pc:25,*
+Chicken nuggets, frozen|fr|296|15|16|19|1|pc:16
+Fish fillets, breaded frozen|fr|230|12|20|11|1|pc:100
+`;
+const BUILTIN_MEALS=[
+{id:'b-adobo',name:'Chicken adobo',time:45,serv:4,tags:['filipino','budget','kid-favorite'],ing:[
+[900,'g','Chicken thigh, boneless skinless'],[0.5,'cup','Soy sauce'],[0.33,'cup','Vinegar'],[8,'clove','Garlic','smashed'],[3,'piece','Bay leaves'],[1,'tsp','Black pepper','whole or cracked'],[1,'tbsp','Vegetable oil'],[0.5,'cup','Water'],[1.5,'cup','White rice, uncooked','to serve']],
+steps:['Brown the chicken in oil over medium-high heat, about 3 minutes per side.','Add garlic and cook 1 minute.','Add soy sauce, vinegar, water, bay leaves and pepper. Do not stir for the first 2 minutes so the vinegar mellows.','Cover and simmer 25 minutes, turning once.','Uncover and reduce the sauce until slightly thick. Serve over rice.']},
+{id:'b-tinola',name:'Chicken tinola (ginger chicken soup)',time:45,serv:4,tags:['filipino','budget'],ing:[
+[800,'g','Chicken thigh, bone-in skin-on'],[2,'piece','Chayote (sayote)','or green papaya, cut in wedges'],[2,'piece','Ginger, fresh','sliced into strips'],[1,'piece','Onion','sliced'],[4,'clove','Garlic','minced'],[2,'tbsp','Fish sauce (patis)'],[2,'cup','Moringa leaves (malunggay)','or spinach'],[6,'cup','Chicken broth'],[1,'tbsp','Vegetable oil'],[1.5,'cup','White rice, uncooked','to serve']],
+steps:['Sauté garlic, onion and ginger in oil until fragrant.','Add chicken and fish sauce; cook 5 minutes until lightly browned.','Pour in broth, bring to a boil, then simmer 20 minutes.','Add chayote and cook 8 minutes until tender.','Stir in malunggay, turn off heat, and season to taste. Serve with rice.']},
+{id:'b-sinigang',name:'Pork sinigang',time:75,serv:4,tags:['filipino'],ing:[
+[800,'g','Pork spare ribs','cut into pieces'],[1,'piece','Sinigang (tamarind) soup mix'],[2,'piece','Tomatoes','quartered'],[1,'piece','Onion','quartered'],[200,'g','Radish (labanos) / daikon','sliced'],[1,'bunch','Water spinach (kangkong)'],[150,'g','Green beans / string beans (sitaw)','cut 2-inch'],[1,'piece','Eggplant (talong)','sliced'],[2,'piece','Long green chili (siling haba)'],[2,'tbsp','Fish sauce (patis)'],[8,'cup','Water'],[1.5,'cup','White rice, uncooked','to serve']],
+steps:['Boil pork in water, skim the foam, then add onion and tomatoes.','Simmer covered 50-60 minutes until pork is tender.','Add radish and cook 5 minutes, then string beans, eggplant and chili for 5 minutes.','Stir in the sinigang mix and fish sauce; taste and adjust sourness.','Add kangkong, turn off heat, and serve hot with rice.']},
+{id:'b-pancit',name:'Pancit bihon',time:40,serv:4,tags:['filipino','kid-favorite'],ing:[
+[250,'g','Rice noodles (bihon), dry'],[350,'g','Chicken breast, boneless skinless','thinly sliced'],[200,'g','Shrimp, raw','peeled'],[3,'cup','Cabbage','shredded'],[1,'piece','Carrots','julienned'],[1,'cup','Snow peas'],[1,'piece','Onion','sliced'],[4,'clove','Garlic','minced'],[0.25,'cup','Soy sauce'],[2,'tbsp','Oyster sauce'],[3,'cup','Chicken broth'],[2,'tbsp','Vegetable oil'],[2,'tbsp','Calamansi juice','or lemon wedges to serve']],
+steps:['Soak noodles in warm water 10 minutes, then drain.','Sauté garlic and onion in oil; add chicken and cook through. Add shrimp until pink, then set the meat aside.','Add carrots, snow peas and cabbage; stir-fry 2 minutes and set aside with the meat.','Pour broth, soy sauce and oyster sauce into the pan and bring to a boil. Add noodles and toss until the liquid is absorbed.','Return meat and vegetables, toss together, and serve with calamansi.']},
+{id:'b-bistek',name:'Bistek Tagalog (beef with onions)',time:40,serv:4,tags:['filipino'],ing:[
+[700,'g','Beef sirloin steak','thinly sliced'],[0.33,'cup','Soy sauce'],[0.25,'cup','Calamansi juice'],[2,'piece','Onion','sliced in rings'],[4,'clove','Garlic','minced'],[0.5,'tsp','Black pepper'],[2,'tbsp','Vegetable oil'],[0.5,'cup','Water'],[1.5,'cup','White rice, uncooked','to serve']],
+steps:['Marinate beef in soy sauce, calamansi, garlic and pepper for at least 15 minutes.','Fry onion rings in oil until just soft; set aside.','Sear beef in batches over high heat, reserving the marinade.','Return all beef, add marinade and water, and simmer 10 minutes until tender.','Top with the onions and serve with rice.']},
+{id:'b-giniling',name:'Pork giniling (picadillo)',time:35,serv:4,tags:['filipino','budget','quick','kid-favorite'],ing:[
+[500,'g','Ground pork'],[1,'piece','Potatoes','small dice'],[1,'piece','Carrots','small dice'],[0.5,'cup','Peas, frozen'],[2,'tbsp','Raisins','optional'],[1,'cup','Tomato sauce'],[1,'piece','Onion','chopped'],[4,'clove','Garlic','minced'],[1,'tbsp','Soy sauce'],[1,'tbsp','Vegetable oil'],[1.5,'cup','White rice, uncooked','to serve']],
+steps:['Sauté garlic and onion in oil.','Add pork and cook until browned, breaking it up.','Add potatoes, carrots, tomato sauce, soy sauce and 1/2 cup water. Simmer 15 minutes.','Stir in peas and raisins; cook 3 more minutes. Season and serve over rice.']},
+{id:'b-monggo',name:'Ginisang monggo (mung bean stew)',time:60,serv:4,tags:['filipino','budget'],ing:[
+[1.5,'cup','Mung beans (monggo), dry','rinsed'],[200,'g','Ground pork','or shrimp'],[2,'piece','Tomatoes','chopped'],[1,'piece','Onion','chopped'],[4,'clove','Garlic','minced'],[2,'cup','Moringa leaves (malunggay)','or spinach'],[2,'tbsp','Fish sauce (patis)'],[6,'cup','Water'],[1,'tbsp','Vegetable oil'],[1,'cup','White rice, uncooked','to serve']],
+steps:['Boil mung beans in water 35-40 minutes until soft and split.','In another pan, sauté garlic, onion and tomatoes in oil, then brown the pork.','Add the pork mixture to the beans with fish sauce; simmer 10 minutes.','Stir in malunggay and turn off heat. Serve with rice.']},
+{id:'b-inasal',name:'Chicken inasal (grilled lemongrass chicken)',time:50,serv:4,tags:['filipino','kid-favorite'],ing:[
+[1000,'g','Chicken thigh, bone-in skin-on'],[2,'stalk','Lemongrass','pounded and chopped'],[0.25,'cup','Calamansi juice'],[2,'tbsp','Vinegar'],[6,'clove','Garlic','minced'],[1,'piece','Ginger, fresh','grated'],[1,'tbsp','Brown sugar'],[2,'tbsp','Butter','melted, for basting'],[1,'tsp','Salt'],[1.5,'cup','White rice, uncooked','to serve']],
+steps:['Mix lemongrass, calamansi, vinegar, garlic, ginger, sugar and salt. Marinate the chicken at least 30 minutes (overnight is best).','Grill or broil over medium heat 25-30 minutes, turning often.','Baste with melted butter during the last 10 minutes.','Rest 5 minutes and serve with rice and a dip of soy sauce and calamansi.']},
+{id:'b-afritada',name:'Chicken afritada',time:45,serv:4,tags:['filipino','kid-favorite'],ing:[
+[800,'g','Chicken thigh, boneless skinless','cut in chunks'],[2,'piece','Potatoes','cubed'],[1,'piece','Carrots','cubed'],[1,'piece','Red bell pepper','sliced'],[1,'cup','Tomato sauce'],[1,'cup','Chicken broth'],[1,'piece','Onion','chopped'],[4,'clove','Garlic','minced'],[1,'tbsp','Fish sauce (patis)'],[1,'tbsp','Vegetable oil'],[1.5,'cup','White rice, uncooked','to serve']],
+steps:['Brown chicken in oil and set aside.','Sauté garlic and onion; return chicken with fish sauce.','Add tomato sauce and broth, simmer 15 minutes.','Add potatoes and carrots; cook 12 minutes until tender.','Add bell pepper for the last 3 minutes. Serve with rice.']},
+{id:'b-torta',name:'Tortang talong (eggplant omelet)',time:35,serv:4,tags:['filipino','budget'],ing:[
+[4,'piece','Eggplant (talong)'],[6,'piece','Eggs'],[250,'g','Ground pork','optional'],[1,'piece','Onion','minced'],[3,'clove','Garlic','minced'],[3,'tbsp','Vegetable oil'],[0.5,'tsp','Salt'],[1,'cup','White rice, uncooked','to serve'],[0.25,'cup','Banana ketchup','to serve']],
+steps:['Grill or broil eggplants until the skin is charred and the flesh is soft. Peel, leaving the stem, and flatten with a fork.','Brown the pork with garlic and onion; season with salt.','Beat eggs with a pinch of salt. Dip each eggplant in egg, top with some pork, and spoon more egg over.','Pan-fry in oil 2-3 minutes per side until set. Serve with rice and banana ketchup.']},
+{id:'b-arrozcaldo',name:'Arroz caldo (chicken rice porridge)',time:50,serv:4,tags:['filipino','budget'],ing:[
+[600,'g','Chicken thigh, boneless skinless','bite-size'],[1,'cup','White rice, uncooked'],[2,'piece','Ginger, fresh','julienned'],[6,'clove','Garlic','minced, half fried crisp for topping'],[1,'piece','Onion','chopped'],[2,'tbsp','Fish sauce (patis)'],[8,'cup','Chicken broth'],[4,'piece','Eggs','hard-boiled'],[3,'stalk','Green onions','sliced'],[1,'tbsp','Vegetable oil'],[4,'piece','Calamansi','to serve']],
+steps:['Sauté half the garlic, onion and ginger in oil. Add chicken and fish sauce; cook 5 minutes.','Add the rice and stir 1 minute, then add broth.','Simmer 30 minutes, stirring often, until thick. Add water if it gets too thick.','Top each bowl with a halved egg, green onions, fried garlic and a squeeze of calamansi.']},
+{id:'b-curry',name:'Filipino chicken curry',time:45,serv:4,tags:['filipino','kid-favorite'],ing:[
+[800,'g','Chicken thigh, boneless skinless','chunks'],[1,'can','Coconut milk, canned'],[2,'piece','Potatoes','cubed'],[1,'piece','Carrots','cubed'],[1,'piece','Red bell pepper','sliced'],[2,'tbsp','Curry powder'],[1,'piece','Onion','chopped'],[4,'clove','Garlic','minced'],[1,'tbsp','Fish sauce (patis)'],[1,'tbsp','Vegetable oil'],[1.5,'cup','White rice, uncooked','to serve']],
+steps:['Sauté garlic and onion in oil; add chicken and brown lightly.','Stir in curry powder and fish sauce for 1 minute.','Add coconut milk and 1/2 cup water; simmer 10 minutes.','Add potatoes and carrots; simmer 15 minutes until tender.','Add bell pepper for the last 3 minutes. Serve with rice.']},
+{id:'b-tacos',name:'Beef tacos',time:25,serv:4,tags:['tex-mex','quick','kid-favorite'],ing:[
+[700,'g','Ground beef 90/10'],[2,'tbsp','Taco seasoning'],[12,'piece','Corn tortillas'],[2,'cup','Iceberg lettuce','shredded'],[2,'piece','Tomatoes','diced'],[1,'cup','Cheddar cheese','shredded'],[0.5,'cup','Sour cream'],[0.5,'cup','Salsa, jarred']],
+steps:['Brown the beef in a skillet, breaking it up; drain fat if needed.','Add taco seasoning and 1/3 cup water; simmer 5 minutes.','Warm tortillas in a dry pan or wrapped in a damp towel in the microwave.','Fill with beef and top with lettuce, tomato, cheese, sour cream and salsa.']},
+{id:'b-fajitas',name:'Chicken fajitas',time:30,serv:4,tags:['tex-mex','quick','kid-favorite'],ing:[
+[800,'g','Chicken breast, boneless skinless','sliced into strips'],[1,'piece','Red bell pepper','sliced'],[1,'piece','Green bell pepper','sliced'],[1,'piece','Yellow bell pepper','sliced'],[1,'piece','Onion','sliced'],[1,'tbsp','Chili powder'],[1,'tsp','Ground cumin'],[1,'tsp','Garlic powder'],[2,'tbsp','Vegetable oil'],[1,'piece','Limes'],[8,'piece','Flour tortillas'],[0.5,'cup','Sour cream'],[0.5,'cup','Salsa, jarred']],
+steps:['Toss chicken with spices, half the oil and the juice of half a lime.','Sear chicken in a very hot skillet 5-6 minutes until cooked; remove.','Add remaining oil, peppers and onion; cook 5 minutes until charred but crisp.','Return chicken, squeeze over the rest of the lime, and serve in warm tortillas with sour cream and salsa.']},
+{id:'b-enchiladas',name:'Chicken enchiladas',time:45,serv:4,tags:['tex-mex','kid-favorite'],ing:[
+[500,'g','Rotisserie chicken meat','shredded'],[2.5,'cup','Enchilada sauce'],[10,'piece','Corn tortillas'],[1.5,'cup','Mexican blend cheese, shredded'],[1,'piece','Onion','diced'],[1,'can','Black beans, cooked or canned','rinsed'],[0.5,'cup','Sour cream','to serve'],[0.25,'cup','Cilantro','to serve']],
+steps:['Heat oven to 200°C / 400°F.','Mix chicken, beans, onion, 1 cup sauce and half the cheese.','Warm tortillas so they bend, fill each with the mixture, and roll into a baking dish seam-side down.','Pour the remaining sauce over and top with the rest of the cheese.','Bake 20 minutes until bubbly. Top with sour cream and cilantro.']},
+{id:'b-chili',name:'Turkey and bean chili',time:45,serv:4,tags:['tex-mex','budget','make-ahead'],ing:[
+[900,'g','Ground turkey 93/7'],[1,'can','Kidney beans, cooked or canned','drained'],[1,'can','Black beans, cooked or canned','drained'],[2,'can','Diced tomatoes, canned'],[2,'tbsp','Tomato paste'],[1,'piece','Onion','diced'],[1,'piece','Green bell pepper','diced'],[4,'clove','Garlic','minced'],[3,'tbsp','Chili powder'],[1,'tbsp','Ground cumin'],[1,'cup','Chicken broth'],[1,'tbsp','Olive oil'],[0.5,'cup','Cheddar cheese','shredded, to serve']],
+steps:['Cook onion and bell pepper in oil 5 minutes; add garlic.','Add turkey and brown, breaking it up.','Stir in chili powder, cumin and tomato paste for 1 minute.','Add tomatoes, beans and broth. Simmer 25 minutes, stirring now and then.','Season to taste and top with cheese. Even better the next day.']},
+{id:'b-burritobowl',name:'Chicken burrito bowls',time:35,serv:4,tags:['tex-mex','kid-favorite'],ing:[
+[700,'g','Chicken thigh, boneless skinless'],[1.5,'cup','White rice, uncooked'],[1,'can','Black beans, cooked or canned','rinsed'],[1,'cup','Corn, frozen'],[1,'cup','Salsa, jarred'],[1,'piece','Avocado','sliced'],[2,'cup','Romaine lettuce','chopped'],[0.5,'cup','Cheddar cheese','shredded'],[2,'piece','Limes'],[2,'tsp','Chili powder'],[1,'tsp','Ground cumin'],[1,'tbsp','Vegetable oil'],[0.25,'cup','Cilantro']],
+steps:['Cook rice; stir in lime juice and chopped cilantro.','Rub chicken with chili powder, cumin, salt and oil. Pan-sear or grill 6 minutes per side; rest and slice.','Warm beans and corn together.','Build bowls: rice, chicken, beans and corn, lettuce, salsa, avocado and cheese.']},
+{id:'b-burritos',name:'Beef and bean burritos',time:30,serv:4,tags:['tex-mex','budget','quick','kid-favorite'],ing:[
+[500,'g','Ground beef 90/10'],[1,'can','Refried beans, canned'],[8,'piece','Flour tortillas'],[1,'cup','Cheddar cheese','shredded'],[1,'cup','White rice, uncooked'],[0.5,'cup','Salsa, jarred'],[1.5,'tbsp','Taco seasoning']],
+steps:['Cook rice.','Brown beef, add taco seasoning and 1/4 cup water; simmer 5 minutes.','Warm refried beans.','Fill tortillas with beans, rice, beef, cheese and salsa. Roll up tightly.','Toast seam-side down in a dry pan 1-2 minutes per side.']},
+{id:'b-quesadillas',name:'Chicken quesadillas',time:20,serv:4,tags:['tex-mex','quick','kid-favorite'],ing:[
+[450,'g','Rotisserie chicken meat','shredded'],[8,'piece','Flour tortillas'],[2,'cup','Mexican blend cheese, shredded'],[1,'piece','Red bell pepper','diced'],[0.5,'piece','Onion','diced'],[0.5,'cup','Salsa, jarred'],[0.5,'cup','Sour cream']],
+steps:['Sauté pepper and onion 3 minutes.','Lay out 4 tortillas; layer cheese, chicken, vegetables and more cheese. Top with the other tortillas.','Cook in a dry skillet over medium heat 2-3 minutes per side until golden and melted.','Cut in wedges and serve with salsa and sour cream.']},
+{id:'b-carneasada',name:'Carne asada tacos',time:40,serv:4,tags:['tex-mex','kid-favorite'],ing:[
+[900,'g','Flank steak'],[2,'piece','Limes'],[1,'piece','Oranges','juiced'],[4,'clove','Garlic','minced'],[0.5,'cup','Cilantro','chopped'],[1,'tsp','Ground cumin'],[1,'tsp','Chili powder'],[2,'tbsp','Vegetable oil'],[12,'piece','Corn tortillas'],[1,'piece','Onion','finely diced'],[0.5,'cup','Salsa, jarred'],[1,'piece','Avocado']],
+steps:['Mix lime juice, orange juice, garlic, half the cilantro, spices and oil. Marinate steak 30 minutes or up to 8 hours.','Grill or sear over high heat 4-5 minutes per side for medium.','Rest 5 minutes, then slice thinly against the grain.','Serve in warm tortillas with onion, cilantro, salsa and avocado.']},
+{id:'b-migas',name:'Tex-Mex migas',time:20,serv:4,tags:['tex-mex','quick','budget'],ing:[
+[10,'piece','Eggs'],[2,'cup','Tortilla chips','lightly crushed'],[1,'piece','Onion','diced'],[1,'piece','Jalapeño','seeded and diced'],[1,'piece','Tomatoes','diced'],[1,'cup','Monterey Jack cheese','shredded'],[0.5,'cup','Salsa, jarred'],[1,'tbsp','Butter'],[8,'piece','Corn tortillas','warmed, to serve']],
+steps:['Melt butter and cook onion and jalapeño 3 minutes.','Add tomato and chips; stir 1 minute.','Pour in beaten eggs and scramble gently until just set.','Fold in cheese and serve with salsa and warm tortillas.']},
+{id:'b-tortillasoup',name:'Chicken tortilla soup',time:40,serv:4,tags:['tex-mex','budget'],ing:[
+[600,'g','Chicken breast, boneless skinless'],[6,'cup','Chicken broth'],[1,'can','Diced tomatoes, canned'],[1,'can','Black beans, cooked or canned','rinsed'],[1,'cup','Corn, frozen'],[1,'piece','Onion','diced'],[3,'clove','Garlic','minced'],[1,'piece','Jalapeño','diced'],[2,'tsp','Ground cumin'],[2,'tsp','Chili powder'],[1,'piece','Limes'],[2,'cup','Tortilla chips'],[1,'piece','Avocado','diced'],[0.5,'cup','Monterey Jack cheese','shredded'],[1,'tbsp','Olive oil']],
+steps:['Cook onion, garlic and jalapeño in oil 5 minutes. Add spices.','Add broth, tomatoes and whole chicken breasts. Simmer 20 minutes.','Remove chicken, shred it, and return to the pot with beans and corn. Simmer 5 minutes.','Squeeze in lime. Serve topped with chips, avocado and cheese.']},
+{id:'b-carnitas',name:'Slow-cooker pork carnitas',time:300,serv:4,tags:['tex-mex','make-ahead','kid-favorite'],ing:[
+[1200,'g','Pork shoulder (kasim)','cut in large chunks'],[1,'piece','Oranges','juiced'],[2,'piece','Limes','juiced'],[1,'piece','Onion','quartered'],[5,'clove','Garlic','smashed'],[2,'tsp','Ground cumin'],[1,'tsp','Dried oregano'],[1,'tsp','Chili powder'],[1.5,'tsp','Salt'],[12,'piece','Corn tortillas'],[0.5,'cup','Salsa, jarred'],[0.5,'cup','Cilantro']],
+steps:['Rub pork with salt, cumin, oregano and chili powder.','Put pork, onion, garlic and citrus juice in a slow cooker. Cook on low 8 hours or high 5 hours (or pressure cook 60 minutes).','Shred the pork and discard the onion.','Spread on a sheet pan and broil 5 minutes until crispy at the edges.','Serve in warm tortillas with salsa and cilantro.']},
+{id:'b-sheetpan',name:'Sheet-pan lemon chicken and potatoes',time:45,serv:4,tags:['one-pan','kid-favorite'],ing:[
+[900,'g','Chicken breast, boneless skinless','cut in large pieces'],[4,'piece','Red potatoes','cubed'],[3,'cup','Broccoli','florets'],[3,'tbsp','Olive oil'],[1,'piece','Lemons'],[4,'clove','Garlic','minced'],[1,'tsp','Dried oregano'],[1,'tsp','Salt'],[0.5,'tsp','Black pepper']],
+steps:['Heat oven to 220°C / 425°F.','Toss potatoes with 1 tbsp oil and salt; roast 15 minutes.','Toss chicken and broccoli with remaining oil, garlic, oregano, lemon zest and juice, salt and pepper.','Add to the pan and roast 18-20 minutes until chicken reaches 74°C / 165°F.']},
+{id:'b-teriyakisalmon',name:'Teriyaki salmon with rice and broccoli',time:30,serv:4,tags:['quick'],ing:[
+[700,'g','Salmon fillet'],[0.33,'cup','Teriyaki sauce'],[1.5,'cup','Jasmine rice, uncooked'],[4,'cup','Broccoli','florets'],[1,'tbsp','Sesame seeds'],[2,'stalk','Green onions','sliced']],
+steps:['Cook rice.','Heat oven to 200°C / 400°F. Brush salmon with half the teriyaki sauce.','Roast salmon and broccoli on a sheet pan 12-14 minutes.','Brush with the remaining sauce, sprinkle sesame seeds and green onions, and serve over rice.']},
+{id:'b-spaghetti',name:'Spaghetti with meat sauce',time:35,serv:4,tags:['budget','kid-favorite'],ing:[
+[450,'g','Pasta, dry'],[600,'g','Ground beef 90/10'],[3,'cup','Marinara / pasta sauce'],[1,'piece','Onion','diced'],[3,'clove','Garlic','minced'],[0.5,'cup','Parmesan, grated'],[1,'tbsp','Olive oil']],
+steps:['Cook pasta in salted water; drain.','Cook onion in oil 4 minutes, add garlic, then brown the beef.','Add marinara and simmer 15 minutes.','Toss with pasta or spoon over, and top with parmesan.']},
+{id:'b-beefbroc',name:'Beef and broccoli stir-fry',time:30,serv:4,tags:['quick','kid-favorite'],ing:[
+[700,'g','Flank steak','thinly sliced'],[5,'cup','Broccoli','florets'],[0.25,'cup','Soy sauce'],[2,'tbsp','Oyster sauce'],[1,'tbsp','Brown sugar'],[1,'tbsp','Cornstarch'],[4,'clove','Garlic','minced'],[1,'piece','Ginger, fresh','grated'],[2,'tbsp','Vegetable oil'],[1.5,'cup','Jasmine rice, uncooked']],
+steps:['Cook rice.','Toss beef with cornstarch and 1 tbsp soy sauce.','Mix remaining soy sauce, oyster sauce, sugar and 1/3 cup water.','Sear beef in batches in a hot wok with oil; set aside.','Stir-fry broccoli with garlic and ginger 3 minutes with a splash of water. Return beef, add sauce, and toss until glossy.']},
+{id:'b-friedrice',name:'Chicken fried rice',time:25,serv:4,tags:['quick','budget','kid-favorite'],ing:[
+[6,'cup','White rice, cooked','day-old is best'],[500,'g','Chicken breast, boneless skinless','diced'],[4,'piece','Eggs'],[1.5,'cup','Peas and carrots, frozen'],[3,'stalk','Green onions','sliced'],[3,'tbsp','Soy sauce'],[1,'tbsp','Sesame oil'],[2,'tbsp','Vegetable oil'],[3,'clove','Garlic','minced']],
+steps:['Stir-fry chicken in 1 tbsp oil until cooked; set aside.','Scramble eggs in the pan; set aside.','Add remaining oil, garlic, and peas and carrots; cook 2 minutes.','Add rice and stir-fry 4-5 minutes until hot and slightly crisp.','Add soy sauce, sesame oil, chicken, eggs and green onions; toss well.']},
+{id:'b-burgers',name:'Cheeseburgers and oven fries',time:35,serv:4,tags:['kid-favorite'],ing:[
+[700,'g','Ground beef 85/15'],[4,'piece','Hamburger buns'],[4,'slice','Cheddar cheese'],[1.5,'cup','Romaine lettuce','leaves'],[1,'piece','Tomatoes','sliced'],[0.5,'piece','Red onion','sliced'],[4,'tbsp','Ketchup'],[2,'tbsp','Yellow mustard'],[500,'g','French fries, frozen']],
+steps:['Bake fries according to the package.','Shape beef into 4 patties slightly wider than the buns; press a dimple in the center. Season with salt and pepper.','Grill or pan-sear 4 minutes per side; add cheese in the last minute.','Toast buns and build burgers with lettuce, tomato, onion, ketchup and mustard.']},
+{id:'b-greekbowls',name:'Greek chicken bowls',time:35,serv:4,tags:[],ing:[
+[800,'g','Chicken thigh, boneless skinless'],[1,'cup','Quinoa, dry','or rice'],[1,'piece','Cucumber','diced'],[1.5,'cup','Cherry tomatoes','halved'],[0.5,'piece','Red onion','thinly sliced'],[0.5,'cup','Feta cheese','crumbled'],[1,'cup','Greek yogurt, plain nonfat'],[3,'clove','Garlic','minced'],[1,'piece','Lemons'],[2,'tbsp','Olive oil'],[2,'tsp','Dried oregano']],
+steps:['Cook quinoa.','Marinate chicken with half the garlic, lemon juice, oil and oregano for 10+ minutes.','Grill or pan-sear 5-6 minutes per side; rest and slice.','Stir the rest of the garlic and a squeeze of lemon into the yogurt with a pinch of salt.','Build bowls with quinoa, chicken, cucumber, tomatoes, onion, feta and the yogurt sauce.']},
+{id:'b-garlicshrimp',name:'Garlic butter shrimp with zucchini',time:20,serv:4,tags:['quick'],ing:[
+[800,'g','Shrimp, raw','peeled and deveined'],[3,'piece','Zucchini','sliced or spiralized'],[3,'tbsp','Butter'],[6,'clove','Garlic','minced'],[2,'tbsp','Lemon juice'],[0.25,'cup','Parsley','chopped'],[0.5,'tsp','Red pepper flakes'],[1,'tbsp','Olive oil']],
+steps:['Sauté zucchini in oil 3 minutes; season and set aside.','Melt butter, add garlic and pepper flakes for 30 seconds.','Add shrimp and cook 2 minutes per side until pink.','Add lemon juice and parsley, return zucchini, and toss.']},
+{id:'b-porkchops',name:'Pork chops, mashed potatoes and green beans',time:40,serv:4,tags:['kid-favorite'],ing:[
+[4,'piece','Pork loin chop'],[900,'g','Potatoes','peeled and cubed'],[0.5,'cup','Milk, 2%'],[2,'tbsp','Butter'],[400,'g','Green beans / string beans (sitaw)'],[2,'clove','Garlic','minced'],[1,'tbsp','Vegetable oil'],[1,'tsp','Paprika'],[1,'tsp','Salt']],
+steps:['Boil potatoes 15 minutes until tender; drain and mash with milk, butter and salt.','Season chops with paprika, salt and pepper. Sear in oil 4-5 minutes per side to 63°C / 145°F; rest 5 minutes.','Steam or sauté green beans with garlic 5 minutes.','Serve together.']},
+{id:'b-chickenparm',name:'Baked chicken parmesan with pasta',time:45,serv:4,tags:['kid-favorite'],ing:[
+[800,'g','Chicken breast, boneless skinless','halved into cutlets'],[0.75,'cup','Panko breadcrumbs'],[0.5,'cup','Parmesan, grated'],[1,'piece','Eggs'],[1.5,'cup','Marinara / pasta sauce'],[1,'cup','Mozzarella, part-skim','shredded'],[340,'g','Pasta, dry'],[1,'tbsp','Olive oil'],[1,'tsp','Italian seasoning']],
+steps:['Heat oven to 220°C / 425°F.','Dip cutlets in beaten egg, then in panko mixed with half the parmesan and the Italian seasoning.','Place on an oiled sheet pan and bake 15 minutes.','Top each with marinara and mozzarella; bake 8 more minutes.','Meanwhile cook pasta and toss with the remaining sauce and parmesan.']},
+{id:'b-stuffedpeppers',name:'Stuffed bell peppers',time:50,serv:4,tags:['budget'],ing:[
+[500,'g','Ground beef 90/10'],[1.5,'cup','White rice, cooked'],[4,'piece','Red bell pepper','tops cut, seeded'],[1,'can','Diced tomatoes, canned'],[1,'cup','Mozzarella, part-skim','shredded'],[1,'piece','Onion','diced'],[2,'clove','Garlic','minced'],[1,'tsp','Italian seasoning']],
+steps:['Heat oven to 190°C / 375°F.','Brown beef with onion and garlic. Stir in tomatoes, rice and seasoning.','Fill peppers and stand them in a baking dish with 1/4 cup water.','Cover with foil and bake 30 minutes. Top with cheese and bake 10 minutes uncovered.']},
+{id:'b-eggrollbowl',name:'Egg roll in a bowl',time:20,serv:4,tags:['quick','budget'],ing:[
+[700,'g','Ground pork'],[6,'cup','Coleslaw mix'],[1,'piece','Carrots','shredded'],[0.25,'cup','Soy sauce'],[4,'clove','Garlic','minced'],[1,'piece','Ginger, fresh','grated'],[1,'tbsp','Sesame oil'],[3,'stalk','Green onions','sliced'],[1,'tbsp','Sriracha','optional']],
+steps:['Brown pork in a large skillet; drain excess fat.','Add garlic and ginger for 1 minute.','Add coleslaw mix, carrot and soy sauce; stir-fry 4-5 minutes until just wilted.','Finish with sesame oil, green onions and sriracha.']},
+{id:'b-pizza',name:'Homemade pizza night',time:35,serv:4,tags:['kid-favorite'],ing:[
+[2,'piece','Pizza dough'],[1,'cup','Marinara / pasta sauce'],[3,'cup','Mozzarella, part-skim','shredded'],[200,'g','Ham, sliced','chopped'],[1,'piece','Green bell pepper','sliced'],[1.5,'cup','Mushrooms, white','sliced'],[1,'cup','Pineapple chunks, canned','drained, optional'],[1,'tbsp','Olive oil']],
+steps:['Heat oven as hot as it goes (250°C / 480°F) with a tray inside.','Stretch dough into 2 pizzas on parchment and brush the edges with oil.','Spread sauce, add cheese and toppings.','Slide onto the hot tray and bake 10-12 minutes until browned and bubbling.']},
+{id:'b-tunapasta',name:'Tuna and pea pasta',time:20,serv:4,tags:['quick','budget'],ing:[
+[400,'g','Pasta, dry'],[2,'can','Tuna, canned in water (drained)'],[1,'cup','Peas, frozen'],[3,'clove','Garlic','sliced'],[3,'tbsp','Olive oil'],[1,'piece','Lemons'],[0.33,'cup','Parmesan, grated'],[0.25,'tsp','Red pepper flakes']],
+steps:['Cook pasta; add peas for the last 2 minutes. Save 1/2 cup pasta water, then drain.','Warm garlic and pepper flakes in olive oil 1 minute.','Add pasta, peas, tuna, lemon zest and juice, and a splash of pasta water; toss.','Top with parmesan.']},
+{id:'b-steakbowls',name:'Steak and veggie rice bowls',time:30,serv:4,tags:['quick'],ing:[
+[800,'g','Beef sirloin steak'],[1.5,'cup','Jasmine rice, uncooked'],[2,'piece','Zucchini','sliced'],[1,'piece','Red bell pepper','sliced'],[1.5,'cup','Mushrooms, white','sliced'],[3,'tbsp','Soy sauce'],[1,'tbsp','Honey'],[2,'clove','Garlic','minced'],[1,'tbsp','Vegetable oil'],[1,'tsp','Sesame seeds']],
+steps:['Cook rice.','Season steak and sear 4 minutes per side in a hot pan; rest and slice.','Stir-fry vegetables in oil 4-5 minutes.','Mix soy sauce, honey and garlic; toss with the vegetables.','Serve rice topped with vegetables, steak and sesame seeds.']},
+{id:'b-tilapia',name:'Pan-fried tilapia with garlic rice and salad',time:25,serv:4,tags:['quick','budget'],ing:[
+[700,'g','Tilapia fillet'],[2,'tbsp','All-purpose flour'],[2,'tbsp','Vegetable oil'],[1.5,'cup','White rice, uncooked'],[6,'clove','Garlic','minced'],[1,'tbsp','Butter'],[2,'piece','Tomatoes','diced'],[1,'piece','Cucumber','diced'],[0.5,'piece','Red onion','diced'],[2,'tbsp','Vinegar'],[4,'piece','Calamansi']],
+steps:['Cook rice. Fry garlic in butter until golden, then stir it through the rice.','Season fish with salt and pepper and dust with flour.','Pan-fry in oil 3 minutes per side until it flakes.','Toss tomato, cucumber and onion with vinegar and a pinch of salt.','Serve fish with garlic rice, salad and calamansi.']},
+{id:'b-cauliricestirfry',name:'Chicken stir-fry with cauliflower rice',time:30,serv:4,tags:['quick'],ing:[
+[800,'g','Chicken breast, boneless skinless','bite-size'],[1,'piece','Cauliflower','grated or riced'],[3,'cup','Broccoli','florets'],[1,'piece','Red bell pepper','sliced'],[1,'cup','Snow peas'],[3,'tbsp','Soy sauce'],[1,'tbsp','Oyster sauce'],[3,'clove','Garlic','minced'],[1,'piece','Ginger, fresh','grated'],[2,'tbsp','Vegetable oil'],[1,'tsp','Sesame oil'],[2,'stalk','Green onions','sliced']],
+steps:['Stir-fry chicken in 1 tbsp oil until cooked; set aside.','Stir-fry broccoli, pepper and snow peas with garlic and ginger 3-4 minutes.','Return chicken with soy and oyster sauce; toss.','In another pan, cook riced cauliflower in the remaining oil 5 minutes; season with salt.','Serve stir-fry over cauliflower rice with sesame oil and green onions.']},
+{id:'b-salmonasparagus',name:'Lemon garlic salmon with asparagus',time:25,serv:4,tags:['quick','one-pan'],ing:[
+[800,'g','Salmon fillet'],[1,'bunch','Asparagus','trimmed'],[2,'cup','Cherry tomatoes'],[2,'tbsp','Olive oil'],[2,'tbsp','Butter','melted'],[3,'clove','Garlic','minced'],[1,'piece','Lemons'],[0.5,'tsp','Salt'],[0.25,'cup','Parsley','chopped']],
+steps:['Heat oven to 200°C / 400°F.','Toss asparagus and tomatoes with oil and salt on a sheet pan; push to the sides.','Place salmon in the middle. Mix butter, garlic and lemon juice and spoon over the fish.','Roast 12-15 minutes until the salmon flakes. Top with parsley and lemon slices.']},
+{id:'b-tacosalad',name:'Tex-Mex taco salad',time:20,serv:4,tags:['tex-mex','quick'],ing:[
+[700,'g','Ground beef 90/10'],[2,'tbsp','Taco seasoning'],[6,'cup','Romaine lettuce','chopped'],[2,'piece','Tomatoes','diced'],[1,'piece','Avocado','diced'],[1,'cup','Cheddar cheese','shredded'],[0.5,'cup','Black beans, cooked or canned','rinsed'],[0.5,'cup','Salsa, jarred'],[0.5,'cup','Greek yogurt, plain nonfat','as sour cream'],[0.25,'cup','Cilantro']],
+steps:['Brown beef, add taco seasoning and 1/3 cup water; simmer 5 minutes.','Pile lettuce into bowls and top with beef, tomatoes, beans, avocado and cheese.','Dollop with yogurt and salsa, and finish with cilantro.']}
+];
+
+'use strict';
+// ---------- helpers ----------
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const r0=x=>Math.round(x||0);
+const trimN=(x,d)=>String(+(+x).toFixed(d));
+const WD=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parseISO=s=>{const a=s.split('-');return new Date(+a[0],a[1]-1,+a[2])};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const K={settings:'mp_settings',meals:'mp_meals',plan:'mp_plan',shop:'mp_shop',ing:'mp_customIng',draft:'mp_draft',goals:'mp_goals'};
+function load(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){alert('Could not save. Storage may be full.')}}
+let toastT;function toast(t){let el=document.getElementById('toast');if(!el){el=document.createElement('div');el.id='toast';el.className='toast';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=t;el.style.display='';clearTimeout(toastT);toastT=setTimeout(()=>{el.style.display='none'},2200)}
+
+// ---------- ingredient table ----------
+const SECS={pr:'Produce',me:'Meat and seafood',da:'Dairy and eggs',pa:'Pantry',fr:'Frozen',ot:'Other'};
+const SEC_ORDER=['pr','me','da','pa','fr','ot'];
+function parseIngLine(l){const a=l.split('|');const conv={};let approx=false;
+ (a[7]||'').split(',').forEach(x=>{if(x==='*'){approx=true;return}const kv=x.split(':');if(kv[0]&&kv[1])conv[kv[0]]=+kv[1]});
+ return {name:a[0],sec:a[1],kcal:+a[2],p:+a[3],c:+a[4],f:+a[5],fib:+a[6],conv,approx}}
+const BASE_ING=ING_RAW.trim().split('\n').map(parseIngLine);
+let customIng=load(K.ing,[]);
+let ingIndex=new Map();
+const STOP=new Set(['of','and','the','a','an','fresh','freshly','chopped','diced','minced','sliced','finely','roughly','thinly','grated','to','taste','for','serving','serve','optional','about','peeled','crushed','cut','into','pieces','piece','or','plus','more','extra','divided','packed','halved','cubed','trimmed','rinsed','drained','large','medium','small','with','in','some','bite','size']);
+function stem(w){if(w.length>4&&w.endsWith('ies'))return w.slice(0,-3)+'y';if(w.length>3&&w.endsWith('oes'))return w.slice(0,-2);if(w.length>4&&/(ch|sh|ss|x)es$/.test(w))return w.slice(0,-2);if(w.length>3&&w.endsWith('s')&&!w.endsWith('ss'))return w.slice(0,-1);return w}
+function toks(s){return String(s).toLowerCase().replace(/[()]/g,' ').replace(/[^a-z0-9ñé\/%]+/g,' ').split(/\s+/).filter(w=>w&&!STOP.has(w)).map(stem)}
+function rebuildIng(){ingIndex=new Map();BASE_ING.forEach(i=>ingIndex.set(i.name.toLowerCase(),i));
+ customIng.forEach(i=>ingIndex.set(i.name.toLowerCase(),Object.assign({},i,{custom:true})));
+ ingIndex.forEach(i=>{i._t=toks(i.name);i._w=i.name.toLowerCase().split(/[^a-z0-9ñé]+/).filter(Boolean)})}
+function findIng(n){return n?ingIndex.get(String(n).trim().toLowerCase())||null:null}
+function allIng(){return [...ingIndex.values()]}
+// autocomplete: every typed word must start a word in the name
+function searchIng(q,limit){q=q.trim().toLowerCase();if(!q)return [];const qw=q.split(/[^a-z0-9ñé]+/).filter(Boolean);if(!qw.length)return [];
+ const res=[];let n=0;ingIndex.forEach(i=>{n++;if(qw.every(w=>i._w.some(x=>x.startsWith(w))||i.name.toLowerCase().includes(w))){
+  const s=(i.name.toLowerCase().startsWith(q)?0:i._w[0].startsWith(qw[0])?1:2)*1000+n;res.push([s,i])}});
+ res.sort((a,b)=>a[0]-b[0]);return res.slice(0,limit||6).map(x=>x[1])}
+// best guess for free text (used by "paste a list" and "did you mean")
+function bestMatch(text){const qt=toks(text);if(!qt.length)return null;let best=null,bs=0;
+ ingIndex.forEach(i=>{const et=i._t;let m=0;qt.forEach(q=>{if(et.some(e=>e===q||(q.length>=4&&e.startsWith(q))||(e.length>=4&&q.startsWith(e))))m++});
+  if(!m)return;const rq=m/qt.length,re=m/et.length;if(rq<0.5&&re<0.5)return;
+  const s=rq*2+re+(qt.includes(et[0])?0.3:0)-i.name.length/300;if(s>bs){bs=s;best=i}});return best}
+
+// ---------- units ----------
+const UNITS=['g','kg','oz','lb','cup','tbsp','tsp','ml','l','piece','slice','clove','stalk','bunch','can','pinch','to taste'];
+const UNIT_ALIAS={g:'g',gram:'g',grams:'g',gr:'g',kg:'kg',kgs:'kg',kilo:'kg',kilos:'kg',kilogram:'kg',kilograms:'kg',oz:'oz',ounce:'oz',ounces:'oz',lb:'lb',lbs:'lb',pound:'lb',pounds:'lb',ml:'ml',milliliter:'ml',milliliters:'ml',millilitre:'ml',millilitres:'ml',l:'l',liter:'l',liters:'l',litre:'l',litres:'l',cup:'cup',cups:'cup',c:'cup',tbsp:'tbsp',tbsps:'tbsp',tbs:'tbsp',tbl:'tbsp',tablespoon:'tbsp',tablespoons:'tbsp',T:'tbsp',tsp:'tsp',tsps:'tsp',teaspoon:'tsp',teaspoons:'tsp',t:'tsp',piece:'piece',pieces:'piece',pc:'piece',pcs:'piece',each:'piece',whole:'piece',ea:'piece',large:'piece',medium:'piece',small:'piece',fillet:'piece',fillets:'piece',pack:'piece',packs:'piece',packet:'piece',packets:'piece',sachet:'piece',sachets:'piece',head:'piece',heads:'piece',jar:'piece',jars:'piece',block:'piece',blocks:'piece',slice:'slice',slices:'slice',clove:'clove',cloves:'clove',stalk:'stalk',stalks:'stalk',sprig:'stalk',sprigs:'stalk',bunch:'bunch',bunches:'bunch',can:'can',cans:'can',tin:'can',tins:'can',pinch:'pinch',pinches:'pinch',dash:'pinch'};
+const MASS={g:1,kg:1000,oz:28.3495,lb:453.592};
+const VOL={cup:240,tbsp:15,tsp:5,ml:1,l:1000};
+function toGrams(ing,q,u){q=+q||0;if(u==='to taste')return {g:0};if(u==='pinch')return {g:q*0.4};
+ if(MASS[u])return {g:q*MASS[u]};const cv=(ing&&ing.conv)||{};
+ if(VOL[u]){const cup=cv.cup||240;return {g:VOL[u]*q*cup/240,approx:!cv.cup}}
+ if(u==='can')return {g:q*(cv.can||400),approx:!cv.can};
+ const w=cv[u]||cv.pc;return {g:q*(w||100),approx:!w}}
+function calcMacros(ings,serv){const t={kcal:0,p:0,c:0,f:0,fib:0,g:0};const unknown=[],approx=[];
+ (ings||[]).forEach(x=>{if(!x.n||!String(x.n).trim())return;const ing=findIng(x.n);
+  if(!ing){if(x.u!=='to taste')unknown.push(x.n);return}
+  const r=toGrams(ing,x.q,x.u);if(r.approx)approx.push(x.n);const k=r.g/100;
+  t.kcal+=ing.kcal*k;t.p+=ing.p*k;t.c+=ing.c*k;t.f+=ing.f*k;t.fib+=ing.fib*k;t.g+=r.g});
+ const s=Math.max(1,+serv||1),per={};for(const k in t)per[k]=t[k]/s;return {tot:t,per,unknown,approx}}
+const macroCache=new Map();
+function mealMacros(m){let r=macroCache.get(m.id);if(!r){r=calcMacros(m.ing,m.serv);macroCache.set(m.id,r)}return r}
+
+// ---------- quantity formatting ----------
+const UF={'½':.5,'¼':.25,'¾':.75,'⅓':1/3,'⅔':2/3,'⅛':.125};
+function fracStr(q){if(q<=0)return '0';let w=Math.floor(q+1e-9);const r=q-w;
+ const F=[[0,''],[0.25,'¼'],[1/3,'⅓'],[0.5,'½'],[2/3,'⅔'],[0.75,'¾'],[1,'']];let best=F[0],bd=9;
+ F.forEach(f=>{const d=Math.abs(r-f[0]);if(d<bd){bd=d;best=f}});if(best[0]===1)w++;
+ if(!w&&!best[1])return q<0.17?'⅛':'¼';if(w>=10)return String(Math.round(q));return (w?w:'')+best[1]}
+const PLURAL={cup:'cups',slice:'slices',clove:'cloves',stalk:'stalks',bunch:'bunches',can:'cans',pinch:'pinches'};
+function fmtG(g){if(settings.units==='us'){if(g>=453)return trimN(g/453.592,1)+' lb';return trimN(Math.max(0.25,Math.round(g/28.3495*4)/4),2)+' oz'}
+ if(g>=1000)return trimN(g/1000,2)+' kg';return (g<20?trimN(g,1):Math.round(g/5)*5)+' g'}
+function fmtQty(q,u,shop){q=+q||0;if(u==='to taste')return 'to taste';
+ if(u==='g')return fmtG(q);
+ if(u==='kg'||u==='lb'||u==='oz')return settings.units==='us'||u==='kg'?trimN(q,2)+' '+u:fmtG(q*MASS[u]);
+ if(u==='ml'||u==='l')return trimN(q,u==='ml'?0:2)+' '+u;
+ if(shop&&u==='can')q=Math.ceil(q-0.01);
+ else if(shop&&/^(piece|clove|slice|stalk|bunch)$/.test(u))q=Math.ceil(q*2-0.01)/2;
+ const n=fracStr(q);if(u==='piece')return n;return n+' '+(q>1&&PLURAL[u]?PLURAL[u]:u)}
+
+// ---------- state ----------
+const DEFAULT_SETTINGS={startDay:0,servings:4,units:'metric',hidden:[]};
+let settings=Object.assign({},DEFAULT_SETTINGS,load(K.settings,{}));
+let myMeals=load(K.meals,[]);
+let plan=load(K.plan,{});
+let shop=load(K.shop,{week:null,made:null,items:[]});
+let goals=load(K.goals,[]);
+let mealDraft=load(K.draft,null);
+const saveSettings=()=>save(K.settings,settings),saveMeals=()=>{macroCache.clear();save(K.meals,myMeals)},savePlan=()=>save(K.plan,plan),saveShop=()=>save(K.shop,shop),saveIng=()=>{save(K.ing,customIng);rebuildIng();macroCache.clear()},saveDraft=()=>save(K.draft,mealDraft);
+rebuildIng();
+const BUILTINS=BUILTIN_MEALS.map(b=>({id:b.id,name:b.name,time:b.time,serv:b.serv,tags:b.tags,builtin:true,ing:b.ing.map(a=>({q:a[0],u:a[1],n:a[2],note:a[3]||''})),steps:b.steps}));
+function allMeals(){return BUILTINS.filter(m=>!settings.hidden.includes(m.id)).concat(myMeals)}
+function mealById(id){return myMeals.find(m=>m.id===id)||BUILTINS.find(m=>m.id===id)||null}
+function weekStartOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()-settings.startDay+7)%7));return x}
+const thisWeek=()=>iso(weekStartOf(new Date()));
+let curWeek=thisWeek();
+function weekDays(ws){const s=parseISO(ws);return [0,1,2,3,4,5,6].map(i=>iso(addDays(s,i)))}
+function fmtRange(days){const a=parseISO(days[0]),b=parseISO(days[6]);return MON[a.getMonth()]+' '+a.getDate()+' – '+(a.getMonth()===b.getMonth()?'':MON[b.getMonth()]+' ')+b.getDate()}
+function dayTitle(d){const x=parseISO(d);return WD[x.getDay()]+', '+MON[x.getMonth()]+' '+x.getDate()}
+function recentlyUsed(id,ws){ws=ws||curWeek;const from=iso(addDays(parseISO(ws),-14)),to=iso(addDays(parseISO(ws),6));
+ return Object.keys(plan).some(d=>d>=from&&d<=to&&plan[d]&&plan[d].kind==='meal'&&plan[d].meal===id)}
+const TAGS={filipino:'Filipino','tex-mex':'Tex-Mex',budget:'Budget','kid-favorite':'Kid favorite','make-ahead':'Make-ahead','one-pan':'One pan',quick:'Quick'};
+const GOALS={
+ hp:{label:'High protein',test:(m,mm)=>mm.per.p>=45},
+ lc:{label:'Low carb',test:(m,mm)=>mm.per.c<=25},
+ quick:{label:'Under 30 min',test:m=>(+m.time||99)<=30},
+ budget:{label:'Budget',test:m=>(m.tags||[]).includes('budget')},
+ fresh:{label:'Not in last 2 weeks',test:m=>!recentlyUsed(m.id)},
+ fil:{label:'Filipino',test:m=>(m.tags||[]).includes('filipino')},
+ tex:{label:'Tex-Mex',test:m=>(m.tags||[]).includes('tex-mex')},
+ kid:{label:'Kid favorite',test:m=>(m.tags||[]).includes('kid-favorite')}};
+function rankMeals(gs){const list=allMeals().map(m=>({m,mm:mealMacros(m)})).filter(x=>gs.every(g=>GOALS[g]&&GOALS[g].test(x.m,x.mm)));
+ list.forEach(x=>{const p=x.mm.per;let s=0;
+  if(gs.includes('hp'))s+=p.p;if(gs.includes('lc'))s+=40-p.c;if(gs.includes('quick'))s+=(60-(+x.m.time||60))/2;
+  if(!gs.includes('hp')&&!gs.includes('lc'))s+=p.kcal?p.p*400/p.kcal:0;
+  if(recentlyUsed(x.m.id))s-=25;x.score=s});
+ return list.sort((a,b)=>b.score-a.score||a.m.name.localeCompare(b.m.name))}
+
+// ---------- view plumbing ----------
+let view={name:'plan',arg:null};
+function go(name,arg){view={name,arg};render();window.scrollTo(0,0)}
+function header(t,back){$('#title').textContent=t;const b=$('#backBtn');b.style.display=back?'':'none';b.onclick=back||null;$('#hdrRight').innerHTML=''}
+function tabs(on){$('#tabs').innerHTML=[['plan','Plan'],['meals','Meals'],['ideas','Ideas'],['shop','Shop'],['settings','Settings']].map(t=>`<button data-a="tab" data-v="${t[0]}" class="${on===t[0]?'on':''}">${t[1]}</button>`).join('')}
+function render(){const f={plan:renderPlan,day:renderDay,meals:renderMeals,meal:renderMeal,edit:renderEdit,ingedit:renderIngEdit,ideas:renderIdeas,planpick:renderPlanPick,shop:renderShop,settings:renderSettings}[view.name]||renderPlan;f(view.arg)}
+function macBox(p,label){return `<div class="mac"><div><b>${r0(p.kcal)}</b><span>kcal</span></div><div><b>${r0(p.p)}g</b><span>protein</span></div><div><b>${r0(p.c)}g</b><span>carbs</span></div><div><b>${r0(p.f)}g</b><span>fat</span></div><div><b>${r0(p.fib)}g</b><span>fiber</span></div></div>`}
+function mealMeta(m){const mm=mealMacros(m);return `${m.time?m.time+' min · ':''}${r0(mm.per.kcal)} kcal · ${r0(mm.per.p)} g protein · ${r0(mm.per.c)} g carbs`}
+function tagPills(m){return (m.tags||[]).map(t=>`<span class="pill">${esc(TAGS[t]||t)}</span>`).join('')+(m.builtin?'':'<span class="pill">My meal</span>')}
+function weekNav(act){const days=weekDays(curWeek);return `<div class="weeknav"><button data-a="${act}" data-v="-1" aria-label="Previous week">‹</button><div class="grow center"><b>${fmtRange(days)}</b><div class="dim tiny">${curWeek===thisWeek()?'This week':`<button class="ghost sm" data-a="${act}" data-v="0">Go to this week</button>`}</div></div><button data-a="${act}" data-v="1" aria-label="Next week">›</button></div>`}
+
+// ---------- plan ----------
+function renderPlan(){header('Dinner plan');tabs('plan');const days=weekDays(curWeek),today=iso(new Date());
+ let h=weekNav('wk');
+ days.forEach(d=>{const e=plan[d],dt=parseISO(d);let body;
+  if(!e)body='<div class="dim">Nothing planned. Tap to choose.</div>';
+  else if(e.kind==='left')body=`<div class="t2">Leftovers</div>${e.note?`<div class="dim small">${esc(e.note)}</div>`:''}`;
+  else if(e.kind==='out')body=`<div class="t2">Eating out</div>${e.note?`<div class="dim small">${esc(e.note)}</div>`:''}`;
+  else{const m=mealById(e.meal);if(!m)body='<div class="dim">This meal was deleted. Tap to choose another.</div>';
+   else body=`<div class="t2">${esc(m.name)}</div><div class="dim small">${mealMeta(m)} per serving</div><div class="row" style="margin-top:8px"><span class="dim small grow">Servings</span><button class="step" data-a="nserv" data-v="${d}" data-d="-1" aria-label="Fewer servings">−</button><b class="sv">${e.serv}</b><button class="step" data-a="nserv" data-v="${d}" data-d="1" aria-label="More servings">+</button></div>`}
+  h+=`<div class="card day${d===today?' today':''}" data-a="day" data-v="${d}" role="button" tabindex="0"><div class="dlabel">${WD[dt.getDay()]} <span class="dim">${MON[dt.getMonth()]} ${dt.getDate()}</span>${d===today?'<span class="tag">Today</span>':''}</div>${body}</div>`});
+ h+=summaryHTML(days);
+ h+=`<button class="pri full" data-a="genshop">Make shopping list for this week</button>
+ <div class="row" style="margin-top:8px"><button class="grow" data-a="autofill">Fill empty nights</button><button class="grow" data-a="clearweek">Clear week</button></div>`;
+ $('#app').innerHTML=h}
+function summaryHTML(days){const es=days.map(d=>plan[d]);const ms=es.filter(e=>e&&e.kind==='meal'&&mealById(e.meal));
+ const left=es.filter(e=>e&&e.kind==='left').length,out=es.filter(e=>e&&e.kind==='out').length,open=es.filter(e=>!e).length;
+ let h=`<h2>Week summary <span class="estl">Estimates</span></h2><div class="card"><div class="small dim">${ms.length} dinner${ms.length===1?'':'s'} planned · ${left} leftovers · ${out} eating out · ${open} open</div>`;
+ if(!ms.length)return h+'<p class="small" style="margin-bottom:0">Plan a few dinners to see average macros.</p></div>';
+ const avg={kcal:0,p:0,c:0,f:0,fib:0},tot={kcal:0,p:0};
+ ms.forEach(e=>{const mm=mealMacros(mealById(e.meal));for(const k in avg)avg[k]+=mm.per[k]/ms.length;tot.kcal+=mm.per.kcal*e.serv;tot.p+=mm.per.p*e.serv});
+ return h+`<div class="small" style="margin-top:8px">Average per person, per dinner</div>${macBox(avg)}<div class="small">All planned dinners, all servings: <b>${r0(tot.kcal).toLocaleString()}</b> kcal · <b>${r0(tot.p)}</b> g protein</div><div class="tiny dim" style="margin-top:6px">Estimated from USDA-based ingredient values. Real numbers vary with brands, trimming, cooking and how much each person eats.</div></div>`}
+function renderDay(d){const e=plan[d]||null;header(dayTitle(d),()=>go('plan'));tabs('plan');
+ const kind=view.kind||(e?e.kind:'meal');
+ let h=`<div class="seg"><button data-a="setkind" data-v="meal" class="${kind==='meal'?'on':''}">Meal</button><button data-a="setkind" data-v="left" class="${kind==='left'?'on':''}">Leftovers</button><button data-a="setkind" data-v="out" class="${kind==='out'?'on':''}">Eating out</button></div>`;
+ if(kind==='meal'){
+  if(e&&e.kind==='meal'&&mealById(e.meal)){const m=mealById(e.meal);
+   h+=`<div class="card"><div class="dim small">Planned</div><div class="t2">${esc(m.name)}</div><div class="dim small">${mealMeta(m)} per serving</div>
+   <div class="row" style="margin-top:10px"><span class="grow">Servings</span><button class="step" data-a="nserv" data-v="${d}" data-d="-1">−</button><b class="sv">${e.serv}</b><button class="step" data-a="nserv" data-v="${d}" data-d="1">+</button></div>
+   <div class="row" style="margin-top:10px"><button class="grow" data-a="openmeal" data-v="${m.id}">View recipe</button><button class="grow danger" data-a="clearday">Clear night</button></div></div><h2>Change to</h2>`}
+  else h+='<h2>Choose a meal</h2>';
+  h+=`<input id="pickq" type="search" placeholder="Search meals" autocomplete="off"><div class="list" id="picklist" style="margin-top:10px">${pickList('')}</div>
+  <button class="full" data-a="newmeal" style="margin-top:4px">+ Add my own meal</button>`}
+ else{h+=`<label class="f" for="dnote">Note (optional)</label><input id="dnote" placeholder="${kind==='left'?'e.g. Leftover chili':'e.g. Birthday dinner out'}" value="${esc(e&&e.kind===kind?e.note||'':'')}">
+  <button class="pri full" data-a="savekind" data-v="${kind}" style="margin-top:12px">Save</button>${e?'<button class="danger full" data-a="clearday" style="margin-top:8px">Clear night</button>':''}`}
+ $('#app').innerHTML=h;
+ const pq=$('#pickq');if(pq)pq.oninput=()=>{$('#picklist').innerHTML=pickList(pq.value)}}
+function pickList(q){q=q.trim().toLowerCase();const ms=allMeals().filter(m=>!q||m.name.toLowerCase().includes(q)||(m.tags||[]).some(t=>(TAGS[t]||t).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name));
+ if(!ms.length)return '<p class="dim">No meals match.</p>';
+ return ms.map(m=>`<button data-a="pickmeal" data-v="${m.id}"><b>${esc(m.name)}</b><div class="dim small">${mealMeta(m)}${recentlyUsed(m.id)?' · <span class="warn">planned recently</span>':''}</div></button>`).join('')}
+function setNight(d,mealId,serv){plan[d]={kind:'meal',meal:mealId,serv:serv||settings.servings};savePlan()}
+
+// ---------- meals ----------
+let mealFilter='all',mealQ='';
+const MFILTERS=[['all','All'],['mine','My meals'],['fil','Filipino'],['tex','Tex-Mex'],['quick','Under 30 min'],['hp','High protein'],['lc','Low carb'],['budget','Budget'],['kid','Kid favorite']];
+function renderMeals(){header('Meals');tabs('meals');
+ $('#app').innerHTML=`${mealDraft?'<button class="full" data-a="resumedraft" style="margin-bottom:8px">Continue the meal you were adding</button>':''}<button class="pri full" data-a="newmeal">+ Add my own meal</button>
+ <input id="mq" type="search" placeholder="Search meals" value="${esc(mealQ)}" style="margin-top:12px" autocomplete="off">
+ <div class="chips" style="margin-top:10px">${MFILTERS.map(f=>`<button class="chip${mealFilter===f[0]?' on':''}" data-a="mfilter" data-v="${f[0]}">${f[1]}</button>`).join('')}</div>
+ <div class="list" id="mlist"></div>`;
+ const fill=()=>{const q=mealQ.trim().toLowerCase();let ms=allMeals().sort((a,b)=>a.name.localeCompare(b.name));
+  if(mealFilter==='mine')ms=ms.filter(m=>!m.builtin);else if(mealFilter!=='all')ms=ms.filter(m=>GOALS[mealFilter].test(m,mealMacros(m)));
+  if(q)ms=ms.filter(m=>m.name.toLowerCase().includes(q)||m.ing.some(i=>String(i.n).toLowerCase().includes(q)));
+  $('#mlist').innerHTML=`<p class="dim small">${ms.length} meal${ms.length===1?'':'s'}</p>`+(ms.map(m=>`<button data-a="openmeal" data-v="${m.id}"><b>${esc(m.name)}</b><div class="dim small">${mealMeta(m)}</div><div>${tagPills(m)}</div></button>`).join('')||'<p class="dim">Nothing matches. Try another search, or add your own meal.</p>')};
+ fill();$('#mq').oninput=ev=>{mealQ=ev.target.value;fill()}}
+function renderMeal(arg){const m=mealById(arg.id);if(!m)return go('meals');
+ header(m.name,()=>arg.back?go(arg.back.name,arg.back.arg):go('meals'));tabs(arg.back&&arg.back.name==='plan'||arg.back&&arg.back.name==='day'?'plan':arg.back&&arg.back.name==='ideas'?'ideas':'meals');
+ const sv=arg.serv||m.serv,sc=sv/m.serv,mm=mealMacros(m);
+ let h=`<div class="dim small">${m.time?m.time+' min · ':''}Recipe makes ${m.serv} serving${m.serv==1?'':'s'}</div><div style="margin:4px 0 10px">${tagPills(m)}</div>
+ <div class="card"><div class="row"><b class="grow">Per serving</b><span class="estl">Estimate</span></div>${macBox(mm.per)}
+ <div class="small">Whole recipe (${m.serv} servings): ${r0(mm.tot.kcal).toLocaleString()} kcal · ${r0(mm.tot.p)} g protein · ${r0(mm.tot.c)} g carbs · ${r0(mm.tot.f)} g fat</div>
+ ${mm.unknown.length?`<div class="small warn" style="margin-top:6px">Not counted (not in the ingredient table): ${esc(mm.unknown.join(', '))}</div>`:''}
+ ${mm.approx.length?`<div class="tiny dim" style="margin-top:4px">Weight guessed for: ${esc([...new Set(mm.approx)].join(', '))}</div>`:''}</div>
+ <h2>Ingredients</h2><div class="row" style="margin-bottom:6px"><span class="grow small dim">Scale for</span><button class="step" data-a="dserv" data-d="-1">−</button><b class="sv">${sv}</b><button class="step" data-a="dserv" data-d="1">+</button><span class="small dim">servings</span></div>
+ <ul class="ing">${m.ing.map(i=>`<li><b>${esc(fmtQty(i.q*sc,i.u))}</b> ${esc(i.n)}${i.note?` <span class="dim small">(${esc(i.note)})</span>`:''}</li>`).join('')}</ul>`;
+ if(m.steps&&m.steps.length)h+=`<h2>Steps</h2><ol class="steps">${m.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`;
+ h+=`<div style="margin-top:18px"><button class="pri full" data-a="plancta" data-v="${m.id}">Plan this meal</button>
+ <button class="full" data-a="addtoshop" data-v="${m.id}" style="margin-top:8px">Add ingredients to shopping list</button>
+ <div class="row" style="margin-top:8px">${m.builtin?`<button class="grow" data-a="copymeal" data-v="${m.id}">Make a copy to edit</button><button class="grow" data-a="hidemeal" data-v="${m.id}">Hide from library</button>`:`<button class="grow" data-a="editmeal" data-v="${m.id}">Edit</button><button class="grow danger" data-a="delmeal" data-v="${m.id}">Delete</button>`}</div></div>`;
+ $('#app').innerHTML=h}
+function renderPlanPick(mid){const m=mealById(mid);if(!m)return go('meals');header('Plan: '+m.name,()=>go('meal',{id:mid}));tabs('meals');
+ let h=weekNav('pwk')+'<p class="dim small" style="margin-top:0">Tap a night to put this meal there.</p><div class="list">';
+ weekDays(curWeek).forEach(d=>{const e=plan[d];const cur=!e?'Open':e.kind==='left'?'Leftovers':e.kind==='out'?'Eating out':(mealById(e.meal)||{name:'Deleted meal'}).name;
+  h+=`<button data-a="putmeal" data-v="${d}"><b>${dayTitle(d)}</b><div class="small ${e?'dim':'okc'}">${esc(cur)}</div></button>`});
+ $('#app').innerHTML=h+'</div>'}
+
+// ---------- add / edit my own meal ----------
+const EDIT_TAGS=['filipino','tex-mex','budget','kid-favorite','make-ahead','one-pan'];
+function newDraft(src){if(src)return {id:src.builtin?null:src.id,name:src.builtin?src.name+' (my version)':src.name,serv:src.serv,time:src.time||'',tags:(src.tags||[]).slice(),ing:clone(src.ing),steps:(src.steps||[]).join('\n')};
+ return {id:null,name:'',serv:settings.servings,time:'',tags:[],ing:[{q:'',u:'g',n:'',note:''},{q:'',u:'g',n:'',note:''},{q:'',u:'g',n:'',note:''}],steps:''}}
+function renderEdit(){const D=mealDraft;if(!D)return go('meals');
+ header(D.id?'Edit meal':'Add my own meal',()=>{if(confirm('Leave without saving? Your changes will be lost.')){mealDraft=null;saveDraft();go('meals')}});tabs('meals');
+ let h=`<label class="f" for="ename">Meal name</label><input id="ename" data-ef="name" value="${esc(D.name)}" placeholder="e.g. Clint's chicken stir-fry">
+ <div class="row"><div class="grow"><label class="f" for="eserv">Recipe makes (servings)</label><input id="eserv" data-ef="serv" inputmode="numeric" value="${esc(D.serv)}"></div><div class="grow"><label class="f" for="etime">Total time (minutes)</label><input id="etime" data-ef="time" inputmode="numeric" value="${esc(D.time)}"></div></div>
+ <label class="f">Tags</label><div class="chips">${EDIT_TAGS.map(t=>`<button class="chip${D.tags.includes(t)?' on':''}" data-a="etag" data-v="${t}">${TAGS[t]}</button>`).join('')}</div>
+ <h2>Ingredients</h2><p class="dim small" style="margin-top:0">Start typing an ingredient and pick from the list so macros can be estimated.</p><div id="ingrows">`;
+ D.ing.forEach((x,i)=>{h+=ingRowHTML(x,i)});
+ h+=`</div><div class="row" style="margin-top:8px"><button class="grow" data-a="eadd">+ Add ingredient</button><button class="grow" data-a="epaste">Paste a list</button></div>
+ <div id="pastebox" class="card" style="display:none;margin-top:10px"><label class="f" for="pastetxt" style="margin-top:0">One ingredient per line, like "500 g chicken breast" or "2 cups rice"</label><textarea id="pastetxt" rows="6" placeholder="1 kg chicken thighs&#10;1/2 cup soy sauce&#10;6 cloves garlic&#10;2 tbsp vinegar"></textarea><button class="pri full" data-a="pastego" style="margin-top:8px">Add these ingredients</button></div>
+ <h2>Steps (optional)</h2><textarea id="esteps" data-ef="steps" rows="5" placeholder="One step per line">${esc(D.steps)}</textarea>
+ <h2>Estimated macros <span class="estl">Estimate</span></h2><div class="card" id="est"></div>
+ <button class="pri full" data-a="esave">Save meal</button><button class="ghost full" data-a="ecancel" style="margin-top:6px">Cancel</button>`;
+ $('#app').innerHTML=h;updEst()}
+function ingRowHTML(x,i){return `<div class="ingrow" data-i="${i}"><div class="row"><input class="q" data-ef="q" inputmode="decimal" placeholder="Qty" value="${esc(x.q)}" aria-label="Quantity"><select data-ef="u" aria-label="Unit">${UNITS.map(u=>`<option${u===x.u?' selected':''}>${u}</option>`).join('')}</select><span class="grow"></span><button class="sm danger" data-a="erm" data-v="${i}" aria-label="Remove ingredient">Remove</button></div>
+ <div class="acw"><input data-ef="n" placeholder="Ingredient" autocomplete="off" autocorrect="off" value="${esc(x.n)}" aria-label="Ingredient name"><div class="ac"></div></div>
+ <div class="ist small">${ingStatus(x,i)}</div></div>`}
+function ingStatus(x,i){if(!x.n||!String(x.n).trim())return '';const ing=findIng(x.n);
+ if(ing){if(x.u==='to taste')return '<span class="okc">Matched</span> <span class="dim">· not counted</span>';const r=toGrams(ing,x.q,x.u);const k=r.g/100*ing.kcal;
+  return `<span class="okc">Matched</span> <span class="dim">· about ${fmtG(r.g)} · ${r0(k)} kcal${r.approx?' · weight guessed for this unit':''}</span>`}
+ const bm=bestMatch(x.n);
+ return `<span class="warn">Not in the ingredient table.</span>${bm?` <button class="sm" data-a="usesug" data-v="${i}" data-n="${esc(bm.name)}">Use ${esc(bm.name)}</button>`:''} <button class="sm" data-a="newing" data-v="${i}">Add its macros</button>`}
+function updEst(){const D=mealDraft,el=$('#est');if(!D||!el)return;const r=calcMacros(D.ing,D.serv);
+ el.innerHTML=`<b>Per serving</b> <span class="dim small">(recipe makes ${Math.max(1,+D.serv||1)})</span>${macBox(r.per)}<div class="small">Whole recipe: ${r0(r.tot.kcal).toLocaleString()} kcal · ${r0(r.tot.p)} g protein</div>${r.unknown.length?`<div class="small warn" style="margin-top:6px">Not counted yet: ${esc(r.unknown.join(', '))}</div>`:''}`}
+function updRow(i){const row=$(`.ingrow[data-i="${i}"]`);if(row)row.querySelector('.ist').innerHTML=ingStatus(mealDraft.ing[i],i);updEst()}
+const QRE=/^((?:\d+\s+\d+\/\d+)|(?:\d+\/\d+)|(?:\d*\.?\d+\s*[½¼¾⅓⅔⅛]?)|[½¼¾⅓⅔⅛])(?:\s*(?:-|to)\s*\d*\.?\d+)?/;
+function numOf(s){let t=0;String(s).trim().split(/\s+/).forEach(p=>{if(UF[p])t+=UF[p];else if(/^\d+\/\d+$/.test(p)){const a=p.split('/');t+=a[0]/a[1]}else{const l=p.slice(-1);if(UF[l]&&p.length>1)t+=parseFloat(p)+UF[l];else t+=parseFloat(p)||0}});return Math.round(t*1000)/1000}
+function parseLine(raw){let s=String(raw).replace(/^[\s\-–•*·▪]+/,'').replace(/^\d+[.)]\s+(?=[\d½¼¾⅓⅔⅛])/,'').trim();if(!s)return null;
+ let q=null,u=null,rest=s;const m=s.match(QRE);
+ if(m){q=numOf(m[1]);rest=s.slice(m[0].length).trim()}
+ else{const m2=s.match(/^(.*?)\s*[-–—:]\s*((?:\d+\s+\d+\/\d+)|(?:\d+\/\d+)|(?:\d*\.?\d+)|[½¼¾⅓⅔⅛])\s*([A-Za-z]+\.?)?\s*$/);if(m2){q=numOf(m2[2]);rest=(m2[3]?m2[3]+' ':'')+m2[1]}}
+ const um=rest.match(/^([A-Za-z]+)\.?(?:\s+|$)(?:of\s+)?/);
+ if(um){const w=um[1],uu=UNIT_ALIAS[w]||UNIT_ALIAS[w.toLowerCase()];if(uu&&rest.length>um[0].length){u=uu;rest=rest.slice(um[0].length).trim()}}
+ let note='';const notes=[];rest=rest.replace(/\(([^)]*)\)/g,(a,b)=>{notes.push(b.trim());return ' '}).trim();
+ if(/\bto taste\b/i.test(rest)){u='to taste';rest=rest.replace(/,?\s*to taste\b/i,'').trim()}
+ const ci=rest.indexOf(',');let nm=rest;if(ci>0){notes.unshift(rest.slice(ci+1).trim());nm=rest.slice(0,ci).trim()}
+ note=notes.filter(Boolean).join('; ');
+ if(q==null&&!u){u=/^(salt|pepper|black pepper|salt and pepper)$/i.test(nm)?'to taste':'piece';q=u==='to taste'?'':1}
+ if(q!=null&&!u)u='piece';
+ const bm=findIng(nm)||bestMatch(rest);
+ return {q:q==null?'':q,u,n:bm?bm.name:nm.replace(/^\w/,c=>c.toUpperCase()),note:bm&&bm.name.toLowerCase()!==nm.toLowerCase()&&!note?nm:note}}
+
+// ---------- custom ingredient editor ----------
+function renderIngEdit(arg){const ex=arg.edit?customIng.find(i=>i.name===arg.edit):null;const v=ex||{name:arg.name||'',sec:'ot',kcal:'',p:'',c:'',f:'',fib:'',conv:{}};
+ header(ex?'Edit ingredient':'New ingredient',()=>arg.from==='edit'?go('edit'):go('settings'));tabs(arg.from==='edit'?'meals':'settings');
+ $('#app').innerHTML=`<p class="dim small" style="margin-top:0">Enter values from the package label or from USDA FoodData Central. It will be saved to your ingredient list and used in every meal.</p>
+ <label class="f" for="iname">Name</label><input id="iname" value="${esc(v.name)}">
+ <label class="f" for="isec">Store section</label><select id="isec">${SEC_ORDER.map(s=>`<option value="${s}"${v.sec===s?' selected':''}>${SECS[s]}</option>`).join('')}</select>
+ <label class="f" for="iper">Values below are for this many grams</label><input id="iper" inputmode="decimal" value="100">
+ <div class="row"><div class="grow"><label class="f" for="ikcal">Calories</label><input id="ikcal" inputmode="decimal" value="${esc(v.kcal)}"></div><div class="grow"><label class="f" for="ip">Protein (g)</label><input id="ip" inputmode="decimal" value="${esc(v.p)}"></div></div>
+ <div class="row"><div class="grow"><label class="f" for="ic">Carbs (g)</label><input id="ic" inputmode="decimal" value="${esc(v.c)}"></div><div class="grow"><label class="f" for="ifat">Fat (g)</label><input id="ifat" inputmode="decimal" value="${esc(v.f)}"></div><div class="grow"><label class="f" for="ifib">Fiber (g)</label><input id="ifib" inputmode="decimal" value="${esc(v.fib)}"></div></div>
+ <h2>Typical weights (optional)</h2><p class="dim small" style="margin-top:0">Helps when you use pieces, cups or cans instead of grams.</p>
+ <div class="row"><div class="grow"><label class="f" for="ipc">1 piece (g)</label><input id="ipc" inputmode="decimal" value="${esc(v.conv.pc||'')}"></div><div class="grow"><label class="f" for="icup">1 cup (g)</label><input id="icup" inputmode="decimal" value="${esc(v.conv.cup||'')}"></div><div class="grow"><label class="f" for="ican">1 can (g)</label><input id="ican" inputmode="decimal" value="${esc(v.conv.can||'')}"></div></div>
+ <button class="pri full" data-a="ingsave" style="margin-top:16px">Save ingredient</button>${ex?`<button class="danger full" data-a="ingdel" style="margin-top:8px">Delete ingredient</button>`:''}`}
+
+// ---------- ideas ----------
+let ideaId=null;
+function renderIdeas(){header('Meal ideas');tabs('ideas');const ranked=rankMeals(goals);const empty=weekDays(curWeek).filter(d=>!plan[d]).length;
+ if(ideaId&&!ranked.some(x=>x.m.id===ideaId))ideaId=null;
+ let h=`<h2 style="margin-top:4px">What are you after?</h2><div class="chips">${Object.keys(GOALS).map(g=>`<button class="chip${goals.includes(g)?' on':''}" data-a="goal" data-v="${g}">${GOALS[g].label}</button>`).join('')}</div>
+ <div class="card"><b>Fill empty nights</b><div class="dim small">Week of ${fmtRange(weekDays(curWeek))} · ${empty} open night${empty===1?'':'s'}. Uses the goals above and avoids repeats.</div><button class="pri full" data-a="autofill" style="margin-top:10px"${empty?'':' disabled'}>Fill ${empty} empty night${empty===1?'':'s'}</button></div>
+ <div class="card"><b>Get a recipe idea</b><div class="dim small">Picks one meal from your library that fits the goals.</div><button class="full" data-a="idea" style="margin-top:10px">${ideaId?'Show another idea':'Get a recipe idea'}</button>`;
+ if(ideaId){const m=mealById(ideaId);h+=`<div style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px"><div class="t2">${esc(m.name)}</div><div class="dim small">${mealMeta(m)} per serving</div><div>${tagPills(m)}</div><div class="small" style="margin-top:6px">${m.ing.slice(0,6).map(i=>esc(i.n)).join(', ')}${m.ing.length>6?'…':''}</div><div class="row" style="margin-top:10px"><button class="grow" data-a="openmeal" data-v="${m.id}">View recipe</button><button class="grow" data-a="plancta" data-v="${m.id}">Plan it</button></div></div>`}
+ h+=`</div><h2>Best matches (${ranked.length})</h2>`;
+ if(!ranked.length)h+='<p class="dim">No meals match all of these goals. Try turning one off.</p>';
+ h+='<div class="list">'+ranked.slice(0,12).map(x=>`<button data-a="openmeal" data-v="${x.m.id}" data-from="ideas"><b>${esc(x.m.name)}</b><div class="dim small">${mealMeta(x.m)}${recentlyUsed(x.m.id)?' · <span class="warn">planned recently</span>':''}</div></button>`).join('')+'</div>';
+ h+=`<h2>Want something new?</h2><div class="card"><p class="small" style="margin-top:0">This app works offline and doesn't make up recipes. Ask your health coach Vitals instead: this copies a ready-made request you can paste into that chat. Then use Add my own meal and Paste a list to save the answer here.</p>
+ <label class="f" for="vx">Main ingredient (optional)</label><input id="vx" placeholder="e.g. chicken thighs, ground beef, tilapia">
+ <button class="full" data-a="vitals" style="margin-top:10px">Ask Vitals for a new recipe</button><div id="copyout"></div></div>`;
+ $('#app').innerHTML=h}
+function vitalsPrompt(x){const GL={hp:'high protein',lc:'low carb',quick:'ready in under 30 minutes',budget:'budget-friendly',fil:'Filipino style',tex:'Tex-Mex style',kid:'something teenagers will love'};const gl=goals.filter(g=>GL[g]).map(g=>GL[g]);
+ return `Give me a dinner recipe for 4 people (two adults and two teenage boys with big appetites)${x?' using '+x:''}${gl.length?'. Goals: '+gl.join(', '):''}. Include prep and cook time, step-by-step instructions, and estimated macros per serving (calories, protein, carbs, fat, fiber). List the ingredients one per line with amounts first, like "500 g chicken breast" or "2 tbsp soy sauce", so I can paste them into my meal planner. We live in Manila, so use ingredients I can find there.`}
+function autofill(){const days=weekDays(curWeek).filter(d=>!plan[d]);if(!days.length){toast('No empty nights this week');return 0}
+ const inWeek=new Set(weekDays(curWeek).map(d=>plan[d]).filter(e=>e&&e.kind==='meal').map(e=>e.meal));
+ let pool=rankMeals(goals).filter(x=>!inWeek.has(x.m.id));if(!pool.length)pool=rankMeals([]).filter(x=>!inWeek.has(x.m.id));
+ const fresh=pool.filter(x=>!recentlyUsed(x.m.id)),use=(fresh.length>=days.length?fresh:pool).slice();
+ let n=0;days.forEach(d=>{if(!use.length)return;const top=Math.min(use.length,Math.max(4,days.length+2));const k=Math.floor(Math.random()*top);const x=use.splice(k,1)[0];setNight(d,x.m.id);n++});
+ return n}
+
+// ---------- shopping ----------
+function combineQty(g){const parts=g.parts.filter(p=>p.u!=='to taste'&&p.q>0);if(!parts.length)return g.parts.length?'to taste':'';
+ const byU={};parts.forEach(p=>{byU[p.u]=(byU[p.u]||0)+p.q});const us=Object.keys(byU);
+ if(us.length===1)return fmtQty(byU[us[0]],us[0],true);
+ if(us.every(u=>VOL[u])){let ml=0;us.forEach(u=>ml+=byU[u]*VOL[u]);return ml>=60?fmtQty(ml/240,'cup',true):fmtQty(ml/15,'tbsp',true)}
+ if(us.every(u=>MASS[u])){let s=0;us.forEach(u=>s+=byU[u]*MASS[u]);return fmtG(s)}
+ if(g.ing&&us.every(u=>MASS[u]||!toGrams(g.ing,1,u).approx)){let s=0;us.forEach(u=>s+=toGrams(g.ing,byU[u],u).g);return 'about '+fmtG(s)}
+ return us.map(u=>fmtQty(byU[u],u,true)).join(' + ')}
+function genShop(ws){const agg=new Map();
+ weekDays(ws).forEach(d=>{const e=plan[d];if(!e||e.kind!=='meal')return;const m=mealById(e.meal);if(!m)return;const sc=(+e.serv||m.serv)/m.serv;
+  m.ing.forEach(x=>{if(!x.n||/^water$/i.test(String(x.n).trim()))return;const ing=findIng(x.n);const key=(ing?ing.name:String(x.n).trim()).toLowerCase();
+   let g=agg.get(key);if(!g){g={name:ing?ing.name:String(x.n).trim(),ing,parts:[],from:new Set()};agg.set(key,g)}
+   g.parts.push({q:(+x.q||0)*sc,u:x.u});g.from.add(m.name)})});
+ const keepDone=shop.week===ws?new Set(shop.items.filter(i=>!i.manual&&i.done).map(i=>i.key)):new Set();
+ const gen=[];agg.forEach((g,key)=>gen.push({id:uid(),key,name:g.name,qty:combineQty(g),sec:g.ing?g.ing.sec:'ot',done:keepDone.has(key),manual:false,from:[...g.from]}));
+ shop={week:ws,made:new Date().toISOString(),items:shop.items.filter(i=>i.manual).concat(gen)};saveShop();return gen.length}
+function renderShop(){header('Shopping list');tabs('shop');const items=shop.items,done=items.filter(i=>i.done).length;
+ let h=`<div class="card">${weekNav('swk')}<button class="pri full" data-a="genshop">${shop.week===curWeek?'Update list from this week\'s plan':'Make list from this week\'s plan'}</button>
+ <div class="tiny dim" style="margin-top:6px">${shop.week?`Last made from the week of ${fmtRange(weekDays(shop.week))}. `:''}Items you add yourself are kept when the list is remade.</div></div>
+ <h2>Add an item</h2><div class="acw" style="margin-top:0"><input id="addname" placeholder="Item, e.g. paper towels" autocomplete="off"><div class="ac" id="addac"></div></div>
+ <div class="row" style="margin-top:8px"><input id="addqty" class="grow" placeholder="Amount (optional)" style="flex:1"><select id="addsec" style="width:150px"><option value="">Section: auto</option>${SEC_ORDER.map(s=>`<option value="${s}">${SECS[s]}</option>`).join('')}</select></div>
+ <button class="full" data-a="additem" style="margin-top:8px">Add to list</button>`;
+ if(!items.length)h+='<p class="dim" style="margin-top:18px">Your list is empty. Plan some dinners, then tap Make list.</p>';
+ SEC_ORDER.forEach(s=>{const its=items.filter(i=>(i.sec||'ot')===s).sort((a,b)=>(a.done-b.done)||a.name.localeCompare(b.name));if(!its.length)return;
+  h+=`<h2>${SECS[s]} <span class="dim">(${its.filter(i=>!i.done).length})</span></h2><div class="card" style="padding:0 12px">`+its.map(i=>`<div class="item${i.done?' done':''}"><button class="chk${i.done?' on':''}" data-a="tick" data-v="${i.id}" aria-label="${i.done?'Uncheck':'Check'} ${esc(i.name)}">✓</button><div class="txt" data-a="tick" data-v="${i.id}"><b>${esc(i.name)}</b>${i.qty?` <span class="dim">— ${esc(i.qty)}</span>`:''}<div class="tiny dim">${i.manual?'Added by you':'For: '+esc(i.from.join(', '))}</div></div><button class="x" data-a="delitem" data-v="${i.id}" aria-label="Remove ${esc(i.name)}">✕</button></div>`).join('')+'</div>'});
+ if(items.length)h+=`<div class="row" style="margin-top:12px"><button class="grow" data-a="clearchecked"${done?'':' disabled'}>Clear checked (${done})</button><button class="grow" data-a="copylist">Copy list</button></div><button class="danger full" data-a="clearlist" style="margin-top:8px">Clear whole list</button><div id="copyout"></div>`;
+ $('#app').innerHTML=h;
+ const an=$('#addname');an.oninput=()=>{const r=searchIng(an.value,5);$('#addac').innerHTML=r.map(i=>`<button data-a="acadd" data-n="${esc(i.name)}">${esc(i.name)} <span class="dim small">· ${SECS[i.sec]}</span></button>`).join('')};
+ an.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();addManual()}}}
+function addManual(){const n=$('#addname').value.trim();if(!n)return;const ing=findIng(n)||null;
+ shop.items.push({id:uid(),key:'m:'+n.toLowerCase(),name:ing?ing.name:n,qty:$('#addqty').value.trim(),sec:$('#addsec').value||(ing?ing.sec:'ot'),done:false,manual:true,from:[]});saveShop();renderShop();toast('Added '+n)}
+function listText(){let t='Shopping list'+(shop.week?' (week of '+fmtRange(weekDays(shop.week))+')':'')+'\n';
+ SEC_ORDER.forEach(s=>{const its=shop.items.filter(i=>(i.sec||'ot')===s&&!i.done);if(!its.length)return;t+='\n'+SECS[s]+'\n';its.forEach(i=>{t+='- '+i.name+(i.qty?' — '+i.qty:'')+'\n'})});return t}
+
+// ---------- settings ----------
+function renderSettings(){header('Settings');tabs('settings');
+ const hid=settings.hidden.map(id=>BUILTINS.find(m=>m.id===id)).filter(Boolean);
+ let h=`<h2 style="margin-top:4px">Planner</h2><label class="f" for="sstart">Week starts on</label><select id="sstart">${WD.map((w,i)=>`<option value="${i}"${settings.startDay===i?' selected':''}>${w}</option>`).join('')}</select>
+ <label class="f" for="sserv">Default servings per dinner</label><input id="sserv" inputmode="numeric" value="${settings.servings}">
+ <p class="tiny dim">Four people, but teen boys often eat more. Try 5 or 6 if there are usually seconds.</p>
+ <label class="f" for="sunits">Show weights in</label><select id="sunits"><option value="metric"${settings.units==='metric'?' selected':''}>Grams and kilos</option><option value="us"${settings.units==='us'?' selected':''}>Ounces and pounds</option></select>
+ <h2>My ingredients</h2><p class="dim small" style="margin-top:0">Ingredients you added with your own macros. The built-in table has ${BASE_ING.length} ingredients.</p><div class="list">${customIng.map(i=>`<button data-a="editing" data-v="${esc(i.name)}"><b>${esc(i.name)}</b><div class="dim small">Per 100 g: ${r0(i.kcal)} kcal · ${trimN(i.p,1)} g protein · ${trimN(i.c,1)} g carbs · ${trimN(i.f,1)} g fat</div></button>`).join('')||'<p class="dim small">None yet.</p>'}</div>
+ <button class="full" data-a="newing2">+ Add an ingredient</button>`;
+ if(hid.length)h+=`<h2>Hidden meals</h2><div class="list">${hid.map(m=>`<button data-a="unhide" data-v="${m.id}"><b>${esc(m.name)}</b><div class="dim small">Tap to show it again</div></button>`).join('')}</div>`;
+ h+=`<h2>Data</h2><p class="dim small" style="margin-top:0">Everything is saved on this phone only. ${myMeals.length} of my meals, ${Object.keys(plan).length} planned nights, ${shop.items.length} list items. Export a backup now and then.</p>
+ <div class="row"><button class="grow" data-a="export">Export JSON</button><button class="grow" data-a="copyjson">Copy JSON</button></div>
+ <label class="f" for="impfile">Import from file</label><input type="file" id="impfile" accept=".json,application/json,text/plain">
+ <label class="f" for="imptext">Or paste JSON</label><textarea id="imptext" rows="3"></textarea>
+ <button class="full" data-a="importtext" style="margin-top:8px">Import pasted JSON</button>
+ <h2>About the macros</h2><p class="small dim" style="margin-top:0">Macros are estimates. Each ingredient is converted to grams (using typical weights for cups, pieces, cans and cloves) and multiplied by standard per-100 g values based on USDA FoodData Central. A few local items (like longganisa, tocino and sinigang mix) use typical label values. Raw weights are used for meat and dry weights for rice and pasta.</p>
+ <h2>Add to Home Screen</h2><p class="small dim" style="margin-top:0">In Safari, tap Share, then Add to Home Screen. It works offline after the first visit.</p>
+ <h2>Reset</h2><button class="danger full" data-a="reset">Erase all data</button>`;
+ $('#app').innerHTML=h;
+ $('#sstart').onchange=ev=>{settings.startDay=+ev.target.value;saveSettings();curWeek=thisWeek();toast('Saved')};
+ $('#sserv').onchange=ev=>{const v=Math.min(20,Math.max(1,parseInt(ev.target.value)||4));settings.servings=v;ev.target.value=v;saveSettings();toast('Saved')};
+ $('#sunits').onchange=ev=>{settings.units=ev.target.value;saveSettings();toast('Saved')};
+ $('#impfile').onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>doImport(r.result);r.readAsText(f)}}
+function exportData(){return JSON.stringify({app:'family-dinners',version:1,exportedAt:new Date().toISOString(),settings,myMeals,plan,shop,customIng,goals},null,1)}
+function doImport(txt){let o;try{o=JSON.parse(txt)}catch(e){return alert('That is not valid JSON.')}
+ if(!o||o.app!=='family-dinners'||!Array.isArray(o.myMeals)||typeof o.plan!=='object')return alert('This does not look like a Family Dinners export.');
+ if(!confirm(`Replace the data on this phone with ${o.myMeals.length} meals and ${Object.keys(o.plan||{}).length} planned nights from this backup?`))return;
+ settings=Object.assign({},DEFAULT_SETTINGS,o.settings||{});myMeals=o.myMeals;plan=o.plan||{};shop=o.shop&&Array.isArray(o.shop.items)?o.shop:{week:null,made:null,items:[]};customIng=Array.isArray(o.customIng)?o.customIng:[];goals=Array.isArray(o.goals)?o.goals:[];
+ saveSettings();saveMeals();savePlan();saveShop();saveIng();save(K.goals,goals);curWeek=thisWeek();toast('Imported');go('settings')}
+function copyText(t,okMsg){const show=()=>{const box=$('#copyout');if(box){box.innerHTML=`<p class="small warn">Copy didn't work here. Select the text below and copy it.</p><textarea class="copy" rows="6">${esc(t)}</textarea>`;const ta=box.querySelector('textarea');ta.focus();ta.select()}else alert(t)};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>toast(okMsg||'Copied')).catch(show);else show()}
+
+// ---------- events ----------
+function curDay(){return view.name==='day'?view.arg:null}
+document.addEventListener('click',ev=>{
+ if(!ev.target.closest('.acw'))$$('.ac').forEach(a=>{a.innerHTML=''});
+ const b=ev.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a,v=b.dataset.v;
+ switch(a){
+ case 'tab':if(v!=='ideas')ideaId=null;go(v);break;
+ case 'wk':case 'pwk':case 'swk':curWeek=+v===0?thisWeek():iso(addDays(parseISO(curWeek),7*+v));render();break;
+ case 'day':go('day',v);break;
+ case 'nserv':{const e=plan[v];if(!e)return;e.serv=Math.min(20,Math.max(1,(+e.serv||settings.servings)+ +b.dataset.d));savePlan();const y=window.scrollY;render();window.scrollTo(0,y);break}
+ case 'setkind':view.kind=v;renderDay(view.arg);break;
+ case 'savekind':{const d=curDay();plan[d]={kind:v,note:($('#dnote')||{}).value||''};savePlan();toast('Saved');go('plan');break}
+ case 'clearday':{const d=curDay();delete plan[d];savePlan();go('plan');break}
+ case 'pickmeal':{const d=curDay();const old=plan[d];setNight(d,v,old&&old.kind==='meal'?old.serv:settings.servings);toast(mealById(v).name+' planned');go('plan');break}
+ case 'openmeal':go('meal',{id:v,back:view.name==='day'?{name:'day',arg:view.arg}:view.name==='ideas'?{name:'ideas'}:{name:'meals'}});break;
+ case 'dserv':{const m=mealById(view.arg.id);view.arg.serv=Math.min(40,Math.max(1,(view.arg.serv||m.serv)+ +b.dataset.d));const y=window.scrollY;renderMeal(view.arg);window.scrollTo(0,y);break}
+ case 'plancta':go('planpick',v);break;
+ case 'putmeal':{const mid=view.arg;setNight(v,mid);toast(mealById(mid).name+' planned for '+dayTitle(v));go('plan');break}
+ case 'addtoshop':{const m=mealById(v),sv=view.arg.serv||m.serv,sc=sv/m.serv;m.ing.forEach(x=>{if(!x.n||/^water$/i.test(x.n))return;const ing=findIng(x.n);shop.items.push({id:uid(),key:'m:'+x.n.toLowerCase(),name:ing?ing.name:x.n,qty:fmtQty(x.q*sc,x.u,true),sec:ing?ing.sec:'ot',done:false,manual:true,from:[]})});saveShop();toast('Added '+m.ing.length+' items to the list');break}
+ case 'copymeal':mealDraft=newDraft(mealById(v));saveDraft();go('edit');break;
+ case 'editmeal':mealDraft=newDraft(mealById(v));saveDraft();go('edit');break;
+ case 'hidemeal':if(confirm('Hide this meal from the library? You can show it again in Settings.')){settings.hidden.push(v);saveSettings();go('meals')}break;
+ case 'unhide':settings.hidden=settings.hidden.filter(x=>x!==v);saveSettings();renderSettings();break;
+ case 'delmeal':if(confirm('Delete this meal? Nights that use it will show as deleted.')){myMeals=myMeals.filter(m=>m.id!==v);saveMeals();go('meals')}break;
+ case 'resumedraft':go('edit');break;
+ case 'newmeal':mealDraft=newDraft();saveDraft();go('edit');break;
+ case 'mfilter':mealFilter=v;renderMeals();break;
+ case 'etag':{const t=mealDraft.tags;const i=t.indexOf(v);if(i<0)t.push(v);else t.splice(i,1);b.classList.toggle('on',i<0);saveDraft();break}
+ case 'eadd':{mealDraft.ing.push({q:'',u:'g',n:'',note:''});saveDraft();const i=mealDraft.ing.length-1;$('#ingrows').insertAdjacentHTML('beforeend',ingRowHTML(mealDraft.ing[i],i));$(`.ingrow[data-i="${i}"] .q`).focus();break}
+ case 'erm':{mealDraft.ing.splice(+v,1);saveDraft();const y=window.scrollY;renderEdit();window.scrollTo(0,y);break}
+ case 'epaste':{const p=$('#pastebox');p.style.display=p.style.display==='none'?'':'none';if(p.style.display==='')$('#pastetxt').focus();break}
+ case 'pastego':{const lines=$('#pastetxt').value.split(/\n/).map(parseLine).filter(Boolean);if(!lines.length)return;
+  mealDraft.ing=mealDraft.ing.filter(x=>x.n&&String(x.n).trim()).concat(lines);saveDraft();const y=window.scrollY;renderEdit();window.scrollTo(0,y);
+  const miss=lines.filter(x=>!findIng(x.n)).length;toast(`Added ${lines.length} ingredients`+(miss?`, ${miss} need a check`:''));break}
+ case 'acpick':{const i=+v;mealDraft.ing[i].n=b.dataset.n;const row=$(`.ingrow[data-i="${i}"]`);row.querySelector('[data-ef="n"]').value=b.dataset.n;row.querySelector('.ac').innerHTML='';saveDraft();updRow(i);break}
+ case 'usesug':{const i=+v;mealDraft.ing[i].note=mealDraft.ing[i].note||mealDraft.ing[i].n;mealDraft.ing[i].n=b.dataset.n;$(`.ingrow[data-i="${i}"] [data-ef="n"]`).value=b.dataset.n;saveDraft();updRow(i);break}
+ case 'newing':go('ingedit',{name:mealDraft.ing[+v].n,from:'edit',row:+v});break;
+ case 'newing2':go('ingedit',{name:'',from:'settings'});break;
+ case 'editing':go('ingedit',{edit:v,from:'settings'});break;
+ case 'ingsave':{const name=$('#iname').value.trim();if(!name)return alert('Please enter a name.');const per=parseFloat($('#iper').value)||100,f=x=>Math.round((parseFloat($('#'+x).value)||0)*100/per*100)/100;
+  if(!($('#ikcal').value.trim()))return alert('Please enter at least the calories.');
+  const conv={};[['pc','ipc'],['cup','icup'],['can','ican']].forEach(c=>{const n=parseFloat($('#'+c[1]).value);if(n>0)conv[c[0]]=n});
+  const o={name,sec:$('#isec').value,kcal:f('ikcal'),p:f('ip'),c:f('ic'),fib:f('ifib'),f:f('ifat'),conv};
+  const old=view.arg.edit;customIng=customIng.filter(i=>i.name!==old&&i.name.toLowerCase()!==name.toLowerCase());customIng.push(o);saveIng();toast('Ingredient saved');
+  if(view.arg.from==='edit'&&mealDraft){const r=mealDraft.ing[view.arg.row];if(r)r.n=name;saveDraft();go('edit')}else go('settings');break}
+ case 'ingdel':if(confirm('Delete this ingredient? Meals using it will show it as not counted.')){customIng=customIng.filter(i=>i.name!==view.arg.edit);saveIng();go('settings')}break;
+ case 'esave':{const D=mealDraft;const name=($('#ename').value||'').trim();if(!name)return alert('Please give the meal a name.');
+  const ing=D.ing.filter(x=>x.n&&String(x.n).trim()).map(x=>({q:x.q===''?'':+x.q||0,u:x.u,n:String(x.n).trim(),note:x.note||''}));if(!ing.length)return alert('Add at least one ingredient.');
+  const m={id:D.id||'m-'+uid(),name,serv:Math.max(1,parseInt(D.serv)||settings.servings),time:parseInt(D.time)||0,tags:D.tags,ing,steps:String(D.steps||'').split('\n').map(s=>s.trim()).filter(Boolean)};
+  const i=myMeals.findIndex(x=>x.id===m.id);if(i>=0)myMeals[i]=m;else myMeals.push(m);saveMeals();mealDraft=null;saveDraft();toast('Meal saved');go('meal',{id:m.id,back:{name:'meals'}});break}
+ case 'ecancel':mealDraft=null;saveDraft();go('meals');break;
+ case 'goal':{const i=goals.indexOf(v);if(i<0)goals.push(v);else goals.splice(i,1);save(K.goals,goals);ideaId=null;renderIdeas();break}
+ case 'idea':{const r=rankMeals(goals);if(!r.length){toast('No meals match these goals');return}let pool=r.filter(x=>x.m.id!==ideaId);if(!pool.length)pool=r;ideaId=pool[Math.floor(Math.random()*pool.length)].m.id;renderIdeas();break}
+ case 'autofill':{const n=autofill();if(n){toast(`Filled ${n} night${n===1?'':'s'}`);go('plan')}break}
+ case 'clearweek':if(confirm('Clear all 7 nights of this week?')){weekDays(curWeek).forEach(d=>delete plan[d]);savePlan();renderPlan()}break;
+ case 'vitals':copyText(vitalsPrompt(($('#vx').value||'').trim()),'Copied. Paste it into your Vitals chat.');break;
+ case 'genshop':{const n=genShop(curWeek);if(!n){toast('No meals planned this week yet');if(view.name==='shop')renderShop();return}toast(`List made: ${n} items`);go('shop');break}
+ case 'acadd':$('#addname').value=b.dataset.n;$('#addac').innerHTML='';if(!$('#addsec').value){const ing=findIng(b.dataset.n);if(ing)$('#addsec').value=ing.sec}$('#addqty').focus();break;
+ case 'additem':addManual();break;
+ case 'tick':{const it=shop.items.find(i=>i.id===v);if(!it)return;it.done=!it.done;saveShop();const y=window.scrollY;renderShop();window.scrollTo(0,y);break}
+ case 'delitem':shop.items=shop.items.filter(i=>i.id!==v);saveShop();{const y=window.scrollY;renderShop();window.scrollTo(0,y)}break;
+ case 'clearchecked':shop.items=shop.items.filter(i=>!i.done);saveShop();renderShop();toast('Checked items cleared');break;
+ case 'clearlist':if(confirm('Remove every item from the list, including ones you added?')){shop={week:null,made:null,items:[]};saveShop();renderShop()}break;
+ case 'copylist':copyText(listText(),'List copied');break;
+ case 'export':{const blob=new Blob([exportData()],{type:'application/json'});const u=URL.createObjectURL(blob);const l=document.createElement('a');l.href=u;l.download='family-dinners-'+iso(new Date())+'.json';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);break}
+ case 'copyjson':{const t=exportData();(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Copied')).catch(()=>{const ta=$('#imptext');ta.value=t;ta.select();toast('Select all and copy from the box')});break}
+ case 'importtext':doImport($('#imptext').value);break;
+ case 'reset':if(confirm('Erase your meals, plans, shopping list and settings on this phone?')&&confirm('This cannot be undone. Erase?')){Object.values(K).forEach(k=>localStorage.removeItem(k));settings=Object.assign({},DEFAULT_SETTINGS);myMeals=[];plan={};shop={week:null,made:null,items:[]};customIng=[];goals=[];mealDraft=null;rebuildIng();macroCache.clear();curWeek=thisWeek();toast('Erased');go('plan')}break;
+ }
+});
+document.addEventListener('keydown',ev=>{if((ev.key==='Enter'||ev.key===' ')&&ev.target.classList&&ev.target.classList.contains('day')){ev.preventDefault();go('day',ev.target.dataset.v)}});
+function onEditInput(el){if(view.name!=='edit'||!mealDraft||!el.dataset.ef)return;const f=el.dataset.ef,row=el.closest('.ingrow');
+ if(row){const i=+row.dataset.i,x=mealDraft.ing[i];if(!x)return;x[f]=el.value;
+  if(f==='n'){const ac=row.querySelector('.ac');const r=findIng(el.value)?[]:searchIng(el.value,6);ac.innerHTML=r.map(g=>`<button data-a="acpick" data-v="${i}" data-n="${esc(g.name)}">${esc(g.name)}</button>`).join('')}
+  updRow(i)}
+ else{mealDraft[f]=el.value;if(f==='serv')updEst()}
+ saveDraft()}
+document.addEventListener('input',ev=>onEditInput(ev.target));
+document.addEventListener('change',ev=>{if(ev.target.tagName==='SELECT')onEditInput(ev.target)});
+
+// ---------- offline ----------
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+render();
+
+</script>
+</body>
+</html>
