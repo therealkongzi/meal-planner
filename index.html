@@ -575,11 +575,16 @@ function fmtQty(q,u,shop){q=+q||0;if(u==='to taste')return 'to taste';
  const n=fracStr(q);if(u==='piece')return n;return n+' '+(q>1&&PLURAL[u]?PLURAL[u]:u)}
 
 // ---------- state ----------
-const DEFAULT_SETTINGS={startDay:0,servings:4,units:'metric',hidden:[]};
-let settings=Object.assign({},DEFAULT_SETTINGS,load(K.settings,{}));
+const DEFAULT_SETTINGS={startDay:0,shopDay:6,servings:4,units:'metric',hidden:[]};
+function cleanSettings(o){const s=Object.assign({},DEFAULT_SETTINGS,o&&typeof o==='object'?o:{});
+ ['startDay','shopDay'].forEach(k=>{const v=parseInt(s[k]);s[k]=v>=0&&v<=6?v:DEFAULT_SETTINGS[k]});if(!Array.isArray(s.hidden))s.hidden=[];return s}
+let settings=cleanSettings(load(K.settings,{}));
 let myMeals=load(K.meals,[]);
 let plan=load(K.plan,{});
 let shop=load(K.shop,{week:null,made:null,items:[]});
+function cleanShop(o){const s=o&&typeof o==='object'&&Array.isArray(o.items)?o:{week:null,made:null,items:[]};
+ if(!s.state||typeof s.state!=='object'){s.state={};if(s.week)s.state[s.week]={done:s.items.filter(i=>!i.manual&&i.done).map(i=>i.key),removed:[]}}return s}
+shop=cleanShop(shop);
 let goals=load(K.goals,[]);
 let mealDraft=load(K.draft,null);
 const saveSettings=()=>save(K.settings,settings),saveMeals=()=>{macroCache.clear();save(K.meals,myMeals)},savePlan=()=>save(K.plan,plan),saveShop=()=>save(K.shop,shop),saveIng=()=>{save(K.ing,customIng);rebuildIng();macroCache.clear()},saveDraft=()=>save(K.draft,mealDraft);
@@ -589,7 +594,12 @@ function allMeals(){return BUILTINS.filter(m=>!settings.hidden.includes(m.id)).c
 function mealById(id){return myMeals.find(m=>m.id===id)||BUILTINS.find(m=>m.id===id)||null}
 function weekStartOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()-settings.startDay+7)%7));return x}
 const thisWeek=()=>iso(weekStartOf(new Date()));
-let curWeek=thisWeek();
+// Shopping-day rollover: N = days from the shopping day to the next week start (0-6).
+// The "active" week is the week containing (today + N days). So from the shopping day
+// until the week rolls over, the app opens on the upcoming week; other days, this week.
+const shopLead=()=>(settings.startDay-settings.shopDay+7)%7;
+const activeWeek=()=>iso(weekStartOf(addDays(new Date(),shopLead())));
+let curWeek=activeWeek(),lastActive=curWeek;
 function weekDays(ws){const s=parseISO(ws);return [0,1,2,3,4,5,6].map(i=>iso(addDays(s,i)))}
 function fmtRange(days){const a=parseISO(days[0]),b=parseISO(days[6]);return MON[a.getMonth()]+' '+a.getDate()+' – '+(a.getMonth()===b.getMonth()?'':MON[b.getMonth()]+' ')+b.getDate()}
 function dayTitle(d){const x=parseISO(d);return WD[x.getDay()]+', '+MON[x.getMonth()]+' '+x.getDate()}
@@ -621,7 +631,12 @@ function render(){const f={plan:renderPlan,day:renderDay,meals:renderMeals,meal:
 function macBox(p,label){return `<div class="mac"><div><b>${r0(p.kcal)}</b><span>kcal</span></div><div><b>${r0(p.p)}g</b><span>protein</span></div><div><b>${r0(p.c)}g</b><span>carbs</span></div><div><b>${r0(p.f)}g</b><span>fat</span></div><div><b>${r0(p.fib)}g</b><span>fiber</span></div></div>`}
 function mealMeta(m){const mm=mealMacros(m);return `${m.time?m.time+' min · ':''}${r0(mm.per.kcal)} kcal · ${r0(mm.per.p)} g protein · ${r0(mm.per.c)} g carbs`}
 function tagPills(m){return (m.tags||[]).map(t=>`<span class="pill">${esc(TAGS[t]||t)}</span>`).join('')+(m.builtin?'':'<span class="pill">My meal</span>')}
-function weekNav(act){const days=weekDays(curWeek);return `<div class="weeknav"><button data-a="${act}" data-v="-1" aria-label="Previous week">‹</button><div class="grow center"><b>${fmtRange(days)}</b><div class="dim tiny">${curWeek===thisWeek()?'This week':`<button class="ghost sm" data-a="${act}" data-v="0">Go to this week</button>`}</div></div><button data-a="${act}" data-v="1" aria-label="Next week">›</button></div>`}
+function weekLabel(ws){const tw=thisWeek(),d=Math.round((parseISO(ws)-parseISO(tw))/864e5/7);return d===0?'This week':d===1?'Next week':d===-1?'Last week':''}
+function weekNav(act,pre){const days=weekDays(curWeek),tw=thisWeek(),aw=activeWeek();let lab=weekLabel(curWeek);
+ if(curWeek===aw&&aw!==tw)lab+=' · shopping week';
+ let btn='';if(curWeek!==aw)btn+=`<button class="ghost sm" data-a="${act}" data-v="0">${aw===tw?'Go to this week':'Go to shopping week'}</button>`;
+ if(curWeek!==tw&&aw!==tw)btn+=`<button class="ghost sm" data-a="${act}" data-v="t">Back to this week</button>`;
+ return `<div class="weeknav"><button data-a="${act}" data-v="-1" aria-label="Previous week">‹</button><div class="grow center"><b>${pre||''}${fmtRange(days)}</b><div class="dim tiny">${lab}${lab&&btn?' ':''}${btn}</div></div><button data-a="${act}" data-v="1" aria-label="Next week">›</button></div>`}
 
 // ---------- plan ----------
 function renderPlan(){header('Dinner plan');tabs('plan');const days=weekDays(curWeek),today=iso(new Date());
@@ -634,7 +649,7 @@ function renderPlan(){header('Dinner plan');tabs('plan');const days=weekDays(cur
    else body=`<div class="t2">${esc(m.name)}</div><div class="dim small">${mealMeta(m)} per serving</div><div class="row" style="margin-top:8px"><span class="dim small grow">Servings</span><button class="step" data-a="nserv" data-v="${d}" data-d="-1" aria-label="Fewer servings">−</button><b class="sv">${e.serv}</b><button class="step" data-a="nserv" data-v="${d}" data-d="1" aria-label="More servings">+</button></div>`}
   h+=`<div class="card day${d===today?' today':''}" data-a="day" data-v="${d}" role="button" tabindex="0"><div class="dlabel">${WD[dt.getDay()]} <span class="dim">${MON[dt.getMonth()]} ${dt.getDate()}</span>${d===today?'<span class="tag">Today</span>':''}</div>${body}</div>`});
  h+=summaryHTML(days);
- h+=`<button class="pri full" data-a="genshop">Make shopping list for this week</button>
+ h+=`<button class="pri full" data-a="genshop">Shopping list for ${fmtRange(days)}</button>
  <div class="row" style="margin-top:8px"><button class="grow" data-a="autofill">Fill empty nights</button><button class="grow" data-a="clearweek">Clear week</button></div>`;
  $('#app').innerHTML=h}
 function summaryHTML(days){const es=days.map(d=>plan[d]);const ms=es.filter(e=>e&&e.kind==='meal'&&mealById(e.meal));
@@ -788,17 +803,20 @@ function combineQty(g){const parts=g.parts.filter(p=>p.u!=='to taste'&&p.q>0);if
  if(us.every(u=>MASS[u])){let s=0;us.forEach(u=>s+=byU[u]*MASS[u]);return fmtG(s)}
  if(g.ing&&us.every(u=>MASS[u]||!toGrams(g.ing,1,u).approx)){let s=0;us.forEach(u=>s+=toGrams(g.ing,byU[u],u).g);return 'about '+fmtG(s)}
  return us.map(u=>fmtQty(byU[u],u,true)).join(' + ')}
+function wkState(ws){if(!shop.state)shop.state={};const st=shop.state[ws]=shop.state[ws]||{done:[],removed:[]};if(!Array.isArray(st.done))st.done=[];if(!Array.isArray(st.removed))st.removed=[];return st}
 function genShop(ws){const agg=new Map();
  weekDays(ws).forEach(d=>{const e=plan[d];if(!e||e.kind!=='meal')return;const m=mealById(e.meal);if(!m)return;const sc=(+e.serv||m.serv)/m.serv;
   m.ing.forEach(x=>{if(!x.n||/^water$/i.test(String(x.n).trim()))return;const ing=findIng(x.n);const key=(ing?ing.name:String(x.n).trim()).toLowerCase();
    let g=agg.get(key);if(!g){g={name:ing?ing.name:String(x.n).trim(),ing,parts:[],from:new Set()};agg.set(key,g)}
    g.parts.push({q:(+x.q||0)*sc,u:x.u});g.from.add(m.name)})});
- const keepDone=shop.week===ws?new Set(shop.items.filter(i=>!i.manual&&i.done).map(i=>i.key)):new Set();
- const gen=[];agg.forEach((g,key)=>gen.push({id:uid(),key,name:g.name,qty:combineQty(g),sec:g.ing?g.ing.sec:'ot',done:keepDone.has(key),manual:false,from:[...g.from]}));
- shop={week:ws,made:new Date().toISOString(),items:shop.items.filter(i=>i.manual).concat(gen)};saveShop();return gen.length}
-function renderShop(){header('Shopping list');tabs('shop');const items=shop.items,done=items.filter(i=>i.done).length;
- let h=`<div class="card">${weekNav('swk')}<button class="pri full" data-a="genshop">${shop.week===curWeek?'Update list from this week\'s plan':'Make list from this week\'s plan'}</button>
- <div class="tiny dim" style="margin-top:6px">${shop.week?`Last made from the week of ${fmtRange(weekDays(shop.week))}. `:''}Items you add yourself are kept when the list is remade.</div></div>
+ const st=wkState(ws),keepDone=new Set(st.done),rem=new Set(st.removed);
+ const gen=[];agg.forEach((g,key)=>{if(!rem.has(key))gen.push({id:uid(),key,name:g.name,qty:combineQty(g),sec:g.ing?g.ing.sec:'ot',done:keepDone.has(key),manual:false,from:[...g.from]})});
+ const keepW=new Set([ws].concat(Object.keys(shop.state).sort().slice(-12)));Object.keys(shop.state).forEach(k=>{if(!keepW.has(k))delete shop.state[k]});
+ shop.week=ws;shop.made=new Date().toISOString();shop.items=shop.items.filter(i=>i.manual).concat(gen);saveShop();return {n:gen.length,removed:rem.size,meals:weekDays(ws).filter(d=>plan[d]&&plan[d].kind==='meal'&&mealById(plan[d].meal)).length}}
+function renderShop(){const r=genShop(curWeek),rng=fmtRange(weekDays(curWeek));header('Shopping list');tabs('shop');const items=shop.items,done=items.filter(i=>i.done).length;
+ let h=`<div class="card shopfor">${weekNav('swk','For ')}<div class="small" style="margin-top:4px">Built from the ${r.meals} dinner${r.meals===1?'':'s'} planned for ${rng}. It updates by itself when you change that week's plan.</div>
+ ${r.meals?'':'<p class="small" style="margin:6px 0 0">No dinners planned for this week yet. <button class="ghost sm" data-a="tab" data-v="plan">Plan this week</button></p>'}
+ <div class="tiny dim" style="margin-top:6px">Items you add yourself stay on the list for every week.${r.removed?` ${r.removed} item${r.removed===1?'':'s'} you removed are hidden. <button class="ghost sm" data-a="restoreshop">Show them again</button>`:''}</div></div>
  <h2>Add an item</h2><div class="acw" style="margin-top:0"><input id="addname" placeholder="Item, e.g. paper towels" autocomplete="off"><div class="ac" id="addac"></div></div>
  <div class="row" style="margin-top:8px"><input id="addqty" class="grow" placeholder="Amount (optional)" style="flex:1"><select id="addsec" style="width:150px"><option value="">Section: auto</option>${SEC_ORDER.map(s=>`<option value="${s}">${SECS[s]}</option>`).join('')}</select></div>
  <button class="full" data-a="additem" style="margin-top:8px">Add to list</button>`;
@@ -811,13 +829,15 @@ function renderShop(){header('Shopping list');tabs('shop');const items=shop.item
  an.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();addManual()}}}
 function addManual(){const n=$('#addname').value.trim();if(!n)return;const ing=findIng(n)||null;
  shop.items.push({id:uid(),key:'m:'+n.toLowerCase(),name:ing?ing.name:n,qty:$('#addqty').value.trim(),sec:$('#addsec').value||(ing?ing.sec:'ot'),done:false,manual:true,from:[]});saveShop();renderShop();toast('Added '+n)}
-function listText(){let t='Shopping list'+(shop.week?' (week of '+fmtRange(weekDays(shop.week))+')':'')+'\n';
+function listText(){let t='Shopping list'+(shop.week?' for '+fmtRange(weekDays(shop.week)):'')+'\n';
  SEC_ORDER.forEach(s=>{const its=shop.items.filter(i=>(i.sec||'ot')===s&&!i.done);if(!its.length)return;t+='\n'+SECS[s]+'\n';its.forEach(i=>{t+='- '+i.name+(i.qty?' — '+i.qty:'')+'\n'})});return t}
 
 // ---------- settings ----------
 function renderSettings(){header('Settings');tabs('settings');
  const hid=settings.hidden.map(id=>BUILTINS.find(m=>m.id===id)).filter(Boolean);
  let h=`<h2 style="margin-top:4px">Planner</h2><label class="f" for="sstart">Week starts on</label><select id="sstart">${WD.map((w,i)=>`<option value="${i}"${settings.startDay===i?' selected':''}>${w}</option>`).join('')}</select>
+ <label class="f" for="sshop">Shopping day</label><select id="sshop">${WD.map((w,i)=>`<option value="${i}"${settings.shopDay===i?' selected':''}>${w}</option>`).join('')}</select>
+ <p class="tiny dim" id="shopnote">${shopNote()}</p>
  <label class="f" for="sserv">Default servings per dinner</label><input id="sserv" inputmode="numeric" value="${settings.servings}">
  <p class="tiny dim">Four people, but teen boys often eat more. Try 5 or 6 if there are usually seconds.</p>
  <label class="f" for="sunits">Show weights in</label><select id="sunits"><option value="metric"${settings.units==='metric'?' selected':''}>Grams and kilos</option><option value="us"${settings.units==='us'?' selected':''}>Ounces and pounds</option></select>
@@ -833,16 +853,20 @@ function renderSettings(){header('Settings');tabs('settings');
  <h2>Add to Home Screen</h2><p class="small dim" style="margin-top:0">In Safari, tap Share, then Add to Home Screen. It works offline after the first visit.</p>
  <h2>Reset</h2><button class="danger full" data-a="reset">Erase all data</button>`;
  $('#app').innerHTML=h;
- $('#sstart').onchange=ev=>{settings.startDay=+ev.target.value;saveSettings();curWeek=thisWeek();toast('Saved')};
+ $('#sstart').onchange=ev=>{settings.startDay=+ev.target.value;saveSettings();curWeek=lastActive=activeWeek();$('#shopnote').textContent=shopNote();toast('Saved')};
+ $('#sshop').onchange=ev=>{settings.shopDay=+ev.target.value;saveSettings();curWeek=lastActive=activeWeek();$('#shopnote').textContent=shopNote();toast('Saved')};
  $('#sserv').onchange=ev=>{const v=Math.min(20,Math.max(1,parseInt(ev.target.value)||4));settings.servings=v;ev.target.value=v;saveSettings();toast('Saved')};
  $('#sunits').onchange=ev=>{settings.units=ev.target.value;saveSettings();toast('Saved')};
  $('#impfile').onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>doImport(r.result);r.readAsText(f)}}
+function shopNote(){const n=shopLead(),a=WD[settings.shopDay],z=WD[settings.startDay];if(n===0)return `Your shopping day is the first day of the week, so the app always opens on the current week.`;
+ const last=WD[(settings.shopDay+n-1)%7];
+ return (n===1?`On ${a}`:`From ${a} through ${last}`)+`, the app opens on the coming week (the one starting ${z}) so you can plan and shop for it. The rest of the week it opens on the current week.`}
 function exportData(){return JSON.stringify({app:'family-dinners',version:1,exportedAt:new Date().toISOString(),settings,myMeals,plan,shop,customIng,goals},null,1)}
 function doImport(txt){let o;try{o=JSON.parse(txt)}catch(e){return alert('That is not valid JSON.')}
  if(!o||o.app!=='family-dinners'||!Array.isArray(o.myMeals)||typeof o.plan!=='object')return alert('This does not look like a Family Dinners export.');
  if(!confirm(`Replace the data on this phone with ${o.myMeals.length} meals and ${Object.keys(o.plan||{}).length} planned nights from this backup?`))return;
- settings=Object.assign({},DEFAULT_SETTINGS,o.settings||{});myMeals=o.myMeals;plan=o.plan||{};shop=o.shop&&Array.isArray(o.shop.items)?o.shop:{week:null,made:null,items:[]};customIng=Array.isArray(o.customIng)?o.customIng:[];goals=Array.isArray(o.goals)?o.goals:[];
- saveSettings();saveMeals();savePlan();saveShop();saveIng();save(K.goals,goals);curWeek=thisWeek();toast('Imported');go('settings')}
+ settings=cleanSettings(o.settings);myMeals=o.myMeals;plan=o.plan||{};shop=cleanShop(o.shop);customIng=Array.isArray(o.customIng)?o.customIng:[];goals=Array.isArray(o.goals)?o.goals:[];
+ saveSettings();saveMeals();savePlan();saveShop();saveIng();save(K.goals,goals);curWeek=lastActive=activeWeek();toast('Imported');go('settings')}
 function copyText(t,okMsg){const show=()=>{const box=$('#copyout');if(box){box.innerHTML=`<p class="small warn">Copy didn't work here. Select the text below and copy it.</p><textarea class="copy" rows="6">${esc(t)}</textarea>`;const ta=box.querySelector('textarea');ta.focus();ta.select()}else alert(t)};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>toast(okMsg||'Copied')).catch(show);else show()}
 
@@ -853,7 +877,7 @@ document.addEventListener('click',ev=>{
  const b=ev.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a,v=b.dataset.v;
  switch(a){
  case 'tab':if(v!=='ideas')ideaId=null;go(v);break;
- case 'wk':case 'pwk':case 'swk':curWeek=+v===0?thisWeek():iso(addDays(parseISO(curWeek),7*+v));render();break;
+ case 'wk':case 'pwk':case 'swk':curWeek=v==='t'?thisWeek():+v===0?activeWeek():iso(addDays(parseISO(curWeek),7*+v));render();break;
  case 'day':go('day',v);break;
  case 'nserv':{const e=plan[v];if(!e)return;e.serv=Math.min(20,Math.max(1,(+e.serv||settings.servings)+ +b.dataset.d));savePlan();const y=window.scrollY;render();window.scrollTo(0,y);break}
  case 'setkind':view.kind=v;renderDay(view.arg);break;
@@ -902,18 +926,19 @@ document.addEventListener('click',ev=>{
  case 'autofill':{const n=autofill();if(n){toast(`Filled ${n} night${n===1?'':'s'}`);go('plan')}break}
  case 'clearweek':if(confirm('Clear all 7 nights of this week?')){weekDays(curWeek).forEach(d=>delete plan[d]);savePlan();renderPlan()}break;
  case 'vitals':copyText(vitalsPrompt(($('#vx').value||'').trim()),'Copied. Paste it into your Vitals chat.');break;
- case 'genshop':{const n=genShop(curWeek);if(!n){toast('No meals planned this week yet');if(view.name==='shop')renderShop();return}toast(`List made: ${n} items`);go('shop');break}
+ case 'genshop':go('shop');break;
  case 'acadd':$('#addname').value=b.dataset.n;$('#addac').innerHTML='';if(!$('#addsec').value){const ing=findIng(b.dataset.n);if(ing)$('#addsec').value=ing.sec}$('#addqty').focus();break;
  case 'additem':addManual();break;
- case 'tick':{const it=shop.items.find(i=>i.id===v);if(!it)return;it.done=!it.done;saveShop();const y=window.scrollY;renderShop();window.scrollTo(0,y);break}
- case 'delitem':shop.items=shop.items.filter(i=>i.id!==v);saveShop();{const y=window.scrollY;renderShop();window.scrollTo(0,y)}break;
- case 'clearchecked':shop.items=shop.items.filter(i=>!i.done);saveShop();renderShop();toast('Checked items cleared');break;
- case 'clearlist':if(confirm('Remove every item from the list, including ones you added?')){shop={week:null,made:null,items:[]};saveShop();renderShop()}break;
+ case 'tick':{const it=shop.items.find(i=>i.id===v);if(!it)return;it.done=!it.done;if(!it.manual){const st=wkState(shop.week),s=new Set(st.done);it.done?s.add(it.key):s.delete(it.key);st.done=[...s]}saveShop();const y=window.scrollY;renderShop();window.scrollTo(0,y);break}
+ case 'delitem':{const it=shop.items.find(i=>i.id===v);if(it&&!it.manual)wkState(shop.week).removed.push(it.key)}shop.items=shop.items.filter(i=>i.id!==v);saveShop();{const y=window.scrollY;renderShop();window.scrollTo(0,y)}break;
+ case 'clearchecked':shop.items.forEach(i=>{if(i.done&&!i.manual)wkState(shop.week).removed.push(i.key)});shop.items=shop.items.filter(i=>!i.done);saveShop();renderShop();toast('Checked items cleared');break;
+ case 'clearlist':if(confirm('Remove every item from this week\'s list, including ones you added?')){shop.items.forEach(i=>{if(!i.manual)wkState(shop.week).removed.push(i.key)});shop.items=[];saveShop();renderShop()}break;
+ case 'restoreshop':wkState(curWeek).removed=[];saveShop();renderShop();toast('Removed items are back');break;
  case 'copylist':copyText(listText(),'List copied');break;
  case 'export':{const blob=new Blob([exportData()],{type:'application/json'});const u=URL.createObjectURL(blob);const l=document.createElement('a');l.href=u;l.download='family-dinners-'+iso(new Date())+'.json';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);break}
  case 'copyjson':{const t=exportData();(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Copied')).catch(()=>{const ta=$('#imptext');ta.value=t;ta.select();toast('Select all and copy from the box')});break}
  case 'importtext':doImport($('#imptext').value);break;
- case 'reset':if(confirm('Erase your meals, plans, shopping list and settings on this phone?')&&confirm('This cannot be undone. Erase?')){Object.values(K).forEach(k=>localStorage.removeItem(k));settings=Object.assign({},DEFAULT_SETTINGS);myMeals=[];plan={};shop={week:null,made:null,items:[]};customIng=[];goals=[];mealDraft=null;rebuildIng();macroCache.clear();curWeek=thisWeek();toast('Erased');go('plan')}break;
+ case 'reset':if(confirm('Erase your meals, plans, shopping list and settings on this phone?')&&confirm('This cannot be undone. Erase?')){Object.values(K).forEach(k=>localStorage.removeItem(k));settings=Object.assign({},DEFAULT_SETTINGS);myMeals=[];plan={};shop=cleanShop(null);customIng=[];goals=[];mealDraft=null;rebuildIng();macroCache.clear();curWeek=lastActive=activeWeek();toast('Erased');go('plan')}break;
  }
 });
 document.addEventListener('keydown',ev=>{if((ev.key==='Enter'||ev.key===' ')&&ev.target.classList&&ev.target.classList.contains('day')){ev.preventDefault();go('day',ev.target.dataset.v)}});
@@ -929,6 +954,9 @@ document.addEventListener('change',ev=>{if(ev.target.tagName==='SELECT')onEditIn
 // ---------- offline ----------
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 render();
+
+// If the phone kept the app open across a rollover, move to the new active week (only if he hadn't navigated away).
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;const aw=activeWeek();if(aw!==lastActive){if(curWeek===lastActive&&['plan','shop','ideas'].includes(view.name)){curWeek=aw;lastActive=aw;render()}else lastActive=aw}});
 
 </script>
 </body>
