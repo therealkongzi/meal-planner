@@ -360,44 +360,35 @@ French fries, frozen|fr|150|2.3|24|5|2|cup:80
 Dumplings / potstickers, frozen|fr|220|9|25|9|1.5|pc:25,*
 Chicken nuggets, frozen|fr|296|15|16|19|1|pc:16
 Fish fillets, breaded frozen|fr|230|12|20|11|1|pc:100
+Fresh ramen noodles|ot|280|9|55|1.5|2|pc:130,*
+Dried ramen noodles|pa|350|11|72|1.5|3|pc:90,*
+Instant ramen noodles (block, no seasoning)|pa|440|9.5|61|17.5|2.4|pc:70
+Miso paste|pa|198|12.8|25.4|6|5.4|cup:275
+Mirin|pa|241|0.3|43|0|0|cup:265,*
+Sake (cooking rice wine)|pa|134|0.5|5|0|0|cup:233
+Nori sheets|pa|290|41|39|1|33|pc:3,*
+Menma (seasoned bamboo shoots)|pa|40|1.8|5|1.5|2.5|cup:130,*
+Pork bone broth|pa|40|5|0.5|2|0|cup:240,can:411,*
+Dashi granules (hondashi)|pa|224|24|31|0.4|0|cup:150,pc:8,*
+Tahini (sesame paste)|pa|595|17|21|54|9.3|cup:240
+Chili bean paste (doubanjiang)|pa|180|8|18|9|5|cup:280,*
+Chili oil|pa|860|0.5|3|95|0|cup:218,*
+Fish cake (kamaboko)|me|98|12|9.7|0.9|0|pc:160,slice:8,*
+Japanese curry roux|pa|512|6|45|34|3|pc:20,*
+Hominy, canned|pa|72|1.5|14.3|0.9|2.5|cup:165,can:425
+Tomatillos|pr|32|1|5.8|1|1.9|pc:34,cup:132
+Guajillo chiles, dried|pa|281|12|51|8.2|22|pc:6,*
+Ancho chiles, dried|pa|281|11.9|51.4|8.2|21.9|pc:17
+Chipotle peppers in adobo|pa|60|1.5|9|2|4|pc:10,can:198,cup:240,*
+Tostada shells, corn|pa|474|6.2|62|22.6|5.4|pc:13
+Mole paste, jarred|pa|530|8|40|38|8|cup:260,pc:235,*
+Salsa verde, jarred|pa|38|1|6.5|1|1.5|cup:259,*
+Red radishes|pr|16|0.7|3.4|0.1|1.6|pc:9,cup:116
+Split peas, dry|pa|341|24.6|60.4|1.2|25.5|cup:196
+Cannellini / white beans, cooked or canned|pa|118|8.3|21|0.5|6.3|cup:177,can:250
+Dried thyme|pa|276|9.1|64|7.4|37|cup:43
 `;
 const BUILTIN_MEALS=[
-{id:'b-adobo',name:'Chicken adobo',time:45,serv:4,tags:['filipino','budget','kid-favorite'],ing:[
-[900,'g','Chicken thigh, boneless skinless'],[0.5,'cup','Soy sauce'],[0.33,'cup','Vinegar'],[8,'clove','Garlic','smashed'],[3,'piece','Bay leaves'],[1,'tsp','Black pepper','whole or cracked'],[1,'tbsp','Vegetable oil'],[0.5,'cup','Water'],[1.5,'cup','White rice, uncooked','to serve']],
-steps:['Brown the chicken in oil over medium-high heat, about 3 minutes per side.','Add garlic and cook 1 minute.','Add soy sauce, vinegar, water, bay leaves and pepper. Do not stir for the first 2 minutes so the vinegar mellows.','Cover and simmer 25 minutes, turning once.','Uncover and reduce the sauce until slightly thick. Serve over rice.']},
-{id:'b-tinola',name:'Chicken tinola (ginger chicken soup)',time:45,serv:4,tags:['filipino','budget'],ing:[
-[800,'g','Chicken thigh, bone-in skin-on'],[2,'piece','Chayote (sayote)','or green papaya, cut in wedges'],[2,'piece','Ginger, fresh','sliced into strips'],[1,'piece','Onion','sliced'],[4,'clove','Garlic','minced'],[2,'tbsp','Fish sauce (patis)'],[2,'cup','Moringa leaves (malunggay)','or spinach'],[6,'cup','Chicken broth'],[1,'tbsp','Vegetable oil'],[1.5,'cup','White rice, uncooked','to serve']],
-steps:['Sauté garlic, onion and ginger in oil until fragrant.','Add chicken and fish sauce; cook 5 minutes until lightly browned.','Pour in broth, bring to a boil, then simmer 20 minutes.','Add chayote and cook 8 minutes until tender.','Stir in malunggay, turn off heat, and season to taste. Serve with rice.']},
-{id:'b-sinigang',name:'Pork sinigang',time:75,serv:4,tags:['filipino'],ing:[
-[800,'g','Pork spare ribs','cut into pieces'],[1,'piece','Sinigang (tamarind) soup mix'],[2,'piece','Tomatoes','quartered'],[1,'piece','Onion','quartered'],[200,'g','Radish (labanos) / daikon','sliced'],[1,'bunch','Water spinach (kangkong)'],[150,'g','Green beans / string beans (sitaw)','cut 2-inch'],[1,'piece','Eggplant (talong)','sliced'],[2,'piece','Long green chili (siling haba)'],[2,'tbsp','Fish sauce (patis)'],[8,'cup','Water'],[1.5,'cup','White rice, uncooked','to serve']],
-steps:['Boil pork in water, skim the foam, then add onion and tomatoes.','Simmer covered 50-60 minutes until pork is tender.','Add radish and cook 5 minutes, then string beans, eggplant and chili for 5 minutes.','Stir in the sinigang mix and fish sauce; taste and adjust sourness.','Add kangkong, turn off heat, and serve hot with rice.']},
-{id:'b-pancit',name:'Pancit bihon',time:40,serv:4,tags:['filipino','kid-favorite'],ing:[
-[250,'g','Rice noodles (bihon), dry'],[350,'g','Chicken breast, boneless skinless','thinly sliced'],[200,'g','Shrimp, raw','peeled'],[3,'cup','Cabbage','shredded'],[1,'piece','Carrots','julienned'],[1,'cup','Snow peas'],[1,'piece','Onion','sliced'],[4,'clove','Garlic','minced'],[0.25,'cup','Soy sauce'],[2,'tbsp','Oyster sauce'],[3,'cup','Chicken broth'],[2,'tbsp','Vegetable oil'],[2,'tbsp','Calamansi juice','or lemon wedges to serve']],
-steps:['Soak noodles in warm water 10 minutes, then drain.','Sauté garlic and onion in oil; add chicken and cook through. Add shrimp until pink, then set the meat aside.','Add carrots, snow peas and cabbage; stir-fry 2 minutes and set aside with the meat.','Pour broth, soy sauce and oyster sauce into the pan and bring to a boil. Add noodles and toss until the liquid is absorbed.','Return meat and vegetables, toss together, and serve with calamansi.']},
-{id:'b-bistek',name:'Bistek Tagalog (beef with onions)',time:40,serv:4,tags:['filipino'],ing:[
-[700,'g','Beef sirloin steak','thinly sliced'],[0.33,'cup','Soy sauce'],[0.25,'cup','Calamansi juice'],[2,'piece','Onion','sliced in rings'],[4,'clove','Garlic','minced'],[0.5,'tsp','Black pepper'],[2,'tbsp','Vegetable oil'],[0.5,'cup','Water'],[1.5,'cup','White rice, uncooked','to serve']],
-steps:['Marinate beef in soy sauce, calamansi, garlic and pepper for at least 15 minutes.','Fry onion rings in oil until just soft; set aside.','Sear beef in batches over high heat, reserving the marinade.','Return all beef, add marinade and water, and simmer 10 minutes until tender.','Top with the onions and serve with rice.']},
-{id:'b-giniling',name:'Pork giniling (picadillo)',time:35,serv:4,tags:['filipino','budget','quick','kid-favorite'],ing:[
-[500,'g','Ground pork'],[1,'piece','Potatoes','small dice'],[1,'piece','Carrots','small dice'],[0.5,'cup','Peas, frozen'],[2,'tbsp','Raisins','optional'],[1,'cup','Tomato sauce'],[1,'piece','Onion','chopped'],[4,'clove','Garlic','minced'],[1,'tbsp','Soy sauce'],[1,'tbsp','Vegetable oil'],[1.5,'cup','White rice, uncooked','to serve']],
-steps:['Sauté garlic and onion in oil.','Add pork and cook until browned, breaking it up.','Add potatoes, carrots, tomato sauce, soy sauce and 1/2 cup water. Simmer 15 minutes.','Stir in peas and raisins; cook 3 more minutes. Season and serve over rice.']},
-{id:'b-monggo',name:'Ginisang monggo (mung bean stew)',time:60,serv:4,tags:['filipino','budget'],ing:[
-[1.5,'cup','Mung beans (monggo), dry','rinsed'],[200,'g','Ground pork','or shrimp'],[2,'piece','Tomatoes','chopped'],[1,'piece','Onion','chopped'],[4,'clove','Garlic','minced'],[2,'cup','Moringa leaves (malunggay)','or spinach'],[2,'tbsp','Fish sauce (patis)'],[6,'cup','Water'],[1,'tbsp','Vegetable oil'],[1,'cup','White rice, uncooked','to serve']],
-steps:['Boil mung beans in water 35-40 minutes until soft and split.','In another pan, sauté garlic, onion and tomatoes in oil, then brown the pork.','Add the pork mixture to the beans with fish sauce; simmer 10 minutes.','Stir in malunggay and turn off heat. Serve with rice.']},
-{id:'b-inasal',name:'Chicken inasal (grilled lemongrass chicken)',time:50,serv:4,tags:['filipino','kid-favorite'],ing:[
-[1000,'g','Chicken thigh, bone-in skin-on'],[2,'stalk','Lemongrass','pounded and chopped'],[0.25,'cup','Calamansi juice'],[2,'tbsp','Vinegar'],[6,'clove','Garlic','minced'],[1,'piece','Ginger, fresh','grated'],[1,'tbsp','Brown sugar'],[2,'tbsp','Butter','melted, for basting'],[1,'tsp','Salt'],[1.5,'cup','White rice, uncooked','to serve']],
-steps:['Mix lemongrass, calamansi, vinegar, garlic, ginger, sugar and salt. Marinate the chicken at least 30 minutes (overnight is best).','Grill or broil over medium heat 25-30 minutes, turning often.','Baste with melted butter during the last 10 minutes.','Rest 5 minutes and serve with rice and a dip of soy sauce and calamansi.']},
-{id:'b-afritada',name:'Chicken afritada',time:45,serv:4,tags:['filipino','kid-favorite'],ing:[
-[800,'g','Chicken thigh, boneless skinless','cut in chunks'],[2,'piece','Potatoes','cubed'],[1,'piece','Carrots','cubed'],[1,'piece','Red bell pepper','sliced'],[1,'cup','Tomato sauce'],[1,'cup','Chicken broth'],[1,'piece','Onion','chopped'],[4,'clove','Garlic','minced'],[1,'tbsp','Fish sauce (patis)'],[1,'tbsp','Vegetable oil'],[1.5,'cup','White rice, uncooked','to serve']],
-steps:['Brown chicken in oil and set aside.','Sauté garlic and onion; return chicken with fish sauce.','Add tomato sauce and broth, simmer 15 minutes.','Add potatoes and carrots; cook 12 minutes until tender.','Add bell pepper for the last 3 minutes. Serve with rice.']},
-{id:'b-torta',name:'Tortang talong (eggplant omelet)',time:35,serv:4,tags:['filipino','budget'],ing:[
-[4,'piece','Eggplant (talong)'],[6,'piece','Eggs'],[250,'g','Ground pork','optional'],[1,'piece','Onion','minced'],[3,'clove','Garlic','minced'],[3,'tbsp','Vegetable oil'],[0.5,'tsp','Salt'],[1,'cup','White rice, uncooked','to serve'],[0.25,'cup','Banana ketchup','to serve']],
-steps:['Grill or broil eggplants until the skin is charred and the flesh is soft. Peel, leaving the stem, and flatten with a fork.','Brown the pork with garlic and onion; season with salt.','Beat eggs with a pinch of salt. Dip each eggplant in egg, top with some pork, and spoon more egg over.','Pan-fry in oil 2-3 minutes per side until set. Serve with rice and banana ketchup.']},
-{id:'b-arrozcaldo',name:'Arroz caldo (chicken rice porridge)',time:50,serv:4,tags:['filipino','budget'],ing:[
-[600,'g','Chicken thigh, boneless skinless','bite-size'],[1,'cup','White rice, uncooked'],[2,'piece','Ginger, fresh','julienned'],[6,'clove','Garlic','minced, half fried crisp for topping'],[1,'piece','Onion','chopped'],[2,'tbsp','Fish sauce (patis)'],[8,'cup','Chicken broth'],[4,'piece','Eggs','hard-boiled'],[3,'stalk','Green onions','sliced'],[1,'tbsp','Vegetable oil'],[4,'piece','Calamansi','to serve']],
-steps:['Sauté half the garlic, onion and ginger in oil. Add chicken and fish sauce; cook 5 minutes.','Add the rice and stir 1 minute, then add broth.','Simmer 30 minutes, stirring often, until thick. Add water if it gets too thick.','Top each bowl with a halved egg, green onions, fried garlic and a squeeze of calamansi.']},
-{id:'b-curry',name:'Filipino chicken curry',time:45,serv:4,tags:['filipino','kid-favorite'],ing:[
-[800,'g','Chicken thigh, boneless skinless','chunks'],[1,'can','Coconut milk, canned'],[2,'piece','Potatoes','cubed'],[1,'piece','Carrots','cubed'],[1,'piece','Red bell pepper','sliced'],[2,'tbsp','Curry powder'],[1,'piece','Onion','chopped'],[4,'clove','Garlic','minced'],[1,'tbsp','Fish sauce (patis)'],[1,'tbsp','Vegetable oil'],[1.5,'cup','White rice, uncooked','to serve']],
-steps:['Sauté garlic and onion in oil; add chicken and brown lightly.','Stir in curry powder and fish sauce for 1 minute.','Add coconut milk and 1/2 cup water; simmer 10 minutes.','Add potatoes and carrots; simmer 15 minutes until tender.','Add bell pepper for the last 3 minutes. Serve with rice.']},
 {id:'b-tacos',name:'Beef tacos',time:25,serv:4,tags:['tex-mex','quick','kid-favorite'],ing:[
 [700,'g','Ground beef 90/10'],[2,'tbsp','Taco seasoning'],[12,'piece','Corn tortillas'],[2,'cup','Iceberg lettuce','shredded'],[2,'piece','Tomatoes','diced'],[1,'cup','Cheddar cheese','shredded'],[0.5,'cup','Sour cream'],[0.5,'cup','Salsa, jarred']],
 steps:['Brown the beef in a skillet, breaking it up; drain fat if needed.','Add taco seasoning and 1/3 cup water; simmer 5 minutes.','Warm tortillas in a dry pan or wrapped in a damp towel in the microwave.','Fill with beef and top with lettuce, tomato, cheese, sour cream and salsa.']},
@@ -407,7 +398,7 @@ steps:['Toss chicken with spices, half the oil and the juice of half a lime.','S
 {id:'b-enchiladas',name:'Chicken enchiladas',time:45,serv:4,tags:['tex-mex','kid-favorite'],ing:[
 [500,'g','Rotisserie chicken meat','shredded'],[2.5,'cup','Enchilada sauce'],[10,'piece','Corn tortillas'],[1.5,'cup','Mexican blend cheese, shredded'],[1,'piece','Onion','diced'],[1,'can','Black beans, cooked or canned','rinsed'],[0.5,'cup','Sour cream','to serve'],[0.25,'cup','Cilantro','to serve']],
 steps:['Heat oven to 200°C / 400°F.','Mix chicken, beans, onion, 1 cup sauce and half the cheese.','Warm tortillas so they bend, fill each with the mixture, and roll into a baking dish seam-side down.','Pour the remaining sauce over and top with the rest of the cheese.','Bake 20 minutes until bubbly. Top with sour cream and cilantro.']},
-{id:'b-chili',name:'Turkey and bean chili',time:45,serv:4,tags:['tex-mex','budget','make-ahead'],ing:[
+{id:'b-chili',name:'Turkey and bean chili',time:45,serv:4,tags:['tex-mex','stew','budget','make-ahead'],ing:[
 [900,'g','Ground turkey 93/7'],[1,'can','Kidney beans, cooked or canned','drained'],[1,'can','Black beans, cooked or canned','drained'],[2,'can','Diced tomatoes, canned'],[2,'tbsp','Tomato paste'],[1,'piece','Onion','diced'],[1,'piece','Green bell pepper','diced'],[4,'clove','Garlic','minced'],[3,'tbsp','Chili powder'],[1,'tbsp','Ground cumin'],[1,'cup','Chicken broth'],[1,'tbsp','Olive oil'],[0.5,'cup','Cheddar cheese','shredded, to serve']],
 steps:['Cook onion and bell pepper in oil 5 minutes; add garlic.','Add turkey and brown, breaking it up.','Stir in chili powder, cumin and tomato paste for 1 minute.','Add tomatoes, beans and broth. Simmer 25 minutes, stirring now and then.','Season to taste and top with cheese. Even better the next day.']},
 {id:'b-burritobowl',name:'Chicken burrito bowls',time:35,serv:4,tags:['tex-mex','kid-favorite'],ing:[
@@ -428,7 +419,7 @@ steps:['Melt butter and cook onion and jalapeño 3 minutes.','Add tomato and chi
 {id:'b-tortillasoup',name:'Chicken tortilla soup',time:40,serv:4,tags:['tex-mex','budget'],ing:[
 [600,'g','Chicken breast, boneless skinless'],[6,'cup','Chicken broth'],[1,'can','Diced tomatoes, canned'],[1,'can','Black beans, cooked or canned','rinsed'],[1,'cup','Corn, frozen'],[1,'piece','Onion','diced'],[3,'clove','Garlic','minced'],[1,'piece','Jalapeño','diced'],[2,'tsp','Ground cumin'],[2,'tsp','Chili powder'],[1,'piece','Limes'],[2,'cup','Tortilla chips'],[1,'piece','Avocado','diced'],[0.5,'cup','Monterey Jack cheese','shredded'],[1,'tbsp','Olive oil']],
 steps:['Cook onion, garlic and jalapeño in oil 5 minutes. Add spices.','Add broth, tomatoes and whole chicken breasts. Simmer 20 minutes.','Remove chicken, shred it, and return to the pot with beans and corn. Simmer 5 minutes.','Squeeze in lime. Serve topped with chips, avocado and cheese.']},
-{id:'b-carnitas',name:'Slow-cooker pork carnitas',time:300,serv:4,tags:['tex-mex','make-ahead','kid-favorite'],ing:[
+{id:'b-carnitas',name:'Slow-cooker pork carnitas',time:300,serv:4,tags:['tex-mex','slow-cooker','make-ahead','kid-favorite'],ing:[
 [1200,'g','Pork shoulder (kasim)','cut in large chunks'],[1,'piece','Oranges','juiced'],[2,'piece','Limes','juiced'],[1,'piece','Onion','quartered'],[5,'clove','Garlic','smashed'],[2,'tsp','Ground cumin'],[1,'tsp','Dried oregano'],[1,'tsp','Chili powder'],[1.5,'tsp','Salt'],[12,'piece','Corn tortillas'],[0.5,'cup','Salsa, jarred'],[0.5,'cup','Cilantro']],
 steps:['Rub pork with salt, cumin, oregano and chili powder.','Put pork, onion, garlic and citrus juice in a slow cooker. Cook on low 8 hours or high 5 hours (or pressure cook 60 minutes).','Shred the pork and discard the onion.','Spread on a sheet pan and broil 5 minutes until crispy at the edges.','Serve in warm tortillas with salsa and cilantro.']},
 {id:'b-sheetpan',name:'Sheet-pan lemon chicken and potatoes',time:45,serv:4,tags:['one-pan','kid-favorite'],ing:[
@@ -487,7 +478,67 @@ steps:['Stir-fry chicken in 1 tbsp oil until cooked; set aside.','Stir-fry brocc
 steps:['Heat oven to 200°C / 400°F.','Toss asparagus and tomatoes with oil and salt on a sheet pan; push to the sides.','Place salmon in the middle. Mix butter, garlic and lemon juice and spoon over the fish.','Roast 12-15 minutes until the salmon flakes. Top with parsley and lemon slices.']},
 {id:'b-tacosalad',name:'Tex-Mex taco salad',time:20,serv:4,tags:['tex-mex','quick'],ing:[
 [700,'g','Ground beef 90/10'],[2,'tbsp','Taco seasoning'],[6,'cup','Romaine lettuce','chopped'],[2,'piece','Tomatoes','diced'],[1,'piece','Avocado','diced'],[1,'cup','Cheddar cheese','shredded'],[0.5,'cup','Black beans, cooked or canned','rinsed'],[0.5,'cup','Salsa, jarred'],[0.5,'cup','Greek yogurt, plain nonfat','as sour cream'],[0.25,'cup','Cilantro']],
-steps:['Brown beef, add taco seasoning and 1/3 cup water; simmer 5 minutes.','Pile lettuce into bowls and top with beef, tomatoes, beans, avocado and cheese.','Dollop with yogurt and salsa, and finish with cilantro.']}
+steps:['Brown beef, add taco seasoning and 1/3 cup water; simmer 5 minutes.','Pile lettuce into bowls and top with beef, tomatoes, beans, avocado and cheese.','Dollop with yogurt and salsa, and finish with cilantro.']},
+{id:'b-shoyuramen',name:'Shoyu ramen with chashu-style pork',time:150,serv:4,tags:['japanese','make-ahead'],ing:[
+[700,'g','Pork shoulder (kasim)','rolled and tied'],[0.5,'cup','Soy sauce'],[0.25,'cup','Mirin'],[0.25,'cup','Sake (cooking rice wine)'],[2,'tbsp','White sugar'],[4,'clove','Garlic','smashed'],[1,'piece','Ginger, fresh','sliced'],[1,'cup','Water'],[8,'cup','Chicken broth'],[1,'tsp','Dashi granules (hondashi)'],[520,'g','Fresh ramen noodles'],[4,'piece','Eggs','soft-boiled'],[0.5,'cup','Menma (seasoned bamboo shoots)'],[4,'stalk','Green onions','sliced'],[4,'piece','Nori sheets','cut in half']],
+steps:['Brown the pork on all sides in a heavy pot.','Add soy sauce, mirin, sake, sugar, garlic, ginger and the water. Cover and simmer on low for 2 hours, turning every 30 minutes.','Meanwhile soft-boil the eggs for 6½ minutes, cool in ice water and peel. Soak them in a few spoonfuls of the braising liquid.','Heat the broth with the dashi granules and about 1/3 cup of the braising liquid. Taste and add more for a deeper soy flavor.','Cook the noodles as the package says and drain well.','Slice the pork thinly. Divide noodles into bowls, ladle hot broth over, and top with pork, halved eggs, menma, green onions and nori.']},
+{id:'b-misoramen',name:'Miso ramen with pork and corn',time:30,serv:4,tags:['japanese','quick','kid-favorite'],ing:[
+[450,'g','Ground pork'],[0.33,'cup','Miso paste'],[2,'tbsp','Soy sauce'],[1,'tbsp','Sesame oil'],[4,'clove','Garlic','minced'],[1,'tbsp','Ginger, fresh','grated'],[8,'cup','Chicken broth'],[520,'g','Fresh ramen noodles'],[2,'cup','Bean sprouts (togue)'],[1,'cup','Sweet corn kernels'],[2,'tbsp','Butter'],[4,'piece','Eggs','soft-boiled'],[4,'stalk','Green onions','sliced']],
+steps:['Soft-boil the eggs for 6½ minutes, cool in cold water and peel.','Brown the pork in sesame oil with the garlic and ginger, breaking it up, about 6 minutes. Stir in the soy sauce.','Add the broth and bring to a simmer. Turn off the heat and whisk in the miso. Do not boil it after this.','Cook the noodles as the package says. Blanch the bean sprouts in the same water for 30 seconds.','Divide noodles into bowls, ladle broth and pork over, and top with sprouts, corn, a pat of butter, halved eggs and green onions.']},
+{id:'b-tonkotsu',name:'Tonkotsu-style ramen (shortcut pork broth)',time:50,serv:4,tags:['japanese'],ing:[
+[300,'g','Pork belly (liempo)','thinly sliced'],[6,'cup','Pork bone broth'],[1,'cup','Milk, whole'],[3,'tbsp','Soy sauce'],[1,'tbsp','Mirin'],[6,'clove','Garlic','grated'],[1,'tbsp','Ginger, fresh','grated'],[1,'tbsp','Sesame oil'],[520,'g','Fresh ramen noodles'],[4,'piece','Eggs','soft-boiled'],[0.5,'cup','Menma (seasoned bamboo shoots)'],[4,'stalk','Green onions','sliced'],[4,'piece','Nori sheets'],[1,'tbsp','Sesame seeds','toasted']],
+steps:['Soft-boil the eggs for 6½ minutes, cool and peel.','Sear the pork belly slices in a hot pan until golden on both sides. Set aside.','In a pot, cook the garlic and ginger in sesame oil for 1 minute. Add the pork broth and simmer 10 minutes.','Stir in the milk, soy sauce and mirin and heat until steaming, without boiling. The milk gives the creamy, cloudy look of tonkotsu.','Cook the noodles as the package says and drain.','Divide noodles into bowls, ladle broth over, and top with pork belly, halved eggs, menma, green onions, nori and sesame seeds.']},
+{id:'b-tantanmen',name:'Spicy miso tantanmen',time:35,serv:4,tags:['japanese'],ing:[
+[500,'g','Ground pork'],[1,'tbsp','Sesame oil'],[4,'clove','Garlic','minced'],[1,'tbsp','Ginger, fresh','minced'],[2,'tbsp','Chili bean paste (doubanjiang)','use less for milder'],[2,'tbsp','Soy sauce'],[0.25,'cup','Tahini (sesame paste)'],[2,'tbsp','Miso paste'],[7,'cup','Chicken broth'],[1,'cup','Milk, whole'],[520,'g','Fresh ramen noodles'],[400,'g','Bok choy (pechay)','halved'],[4,'stalk','Green onions','sliced'],[1,'tbsp','Sesame seeds'],[1,'tbsp','Chili oil','to serve']],
+steps:['Fry the pork in sesame oil with the garlic and ginger until browned. Stir in the chili bean paste and 1 tablespoon soy sauce and cook 2 minutes. Set aside.','In a bowl, whisk the tahini, miso and remaining soy sauce until smooth.','Heat the broth and milk until steaming. Whisk a ladle of hot broth into the tahini mix, then stir it all back into the pot. Do not boil.','Cook the noodles as the package says, adding the bok choy for the last 2 minutes.','Divide noodles and bok choy into bowls, pour the broth over, and top with the spicy pork, green onions, sesame seeds and a drizzle of chili oil. For milder bowls, serve the chili oil on the side.']},
+{id:'b-shioramen',name:'Chicken shio ramen',time:40,serv:4,tags:['japanese'],ing:[
+[700,'g','Chicken thigh, boneless skinless'],[1,'tbsp','Sesame oil'],[8,'cup','Chicken broth'],[2,'tbsp','Sake (cooking rice wine)'],[1,'tbsp','Mirin'],[1,'tsp','Dashi granules (hondashi)'],[1,'tsp','Salt','adjust to taste'],[4,'clove','Garlic','sliced'],[1,'piece','Ginger, fresh','sliced'],[520,'g','Fresh ramen noodles'],[4,'piece','Eggs','soft-boiled'],[3,'cup','Spinach'],[100,'g','Fish cake (kamaboko)','sliced'],[4,'stalk','Green onions','sliced'],[1,'piece','Lemons','cut in wedges']],
+steps:['Soft-boil the eggs for 6½ minutes, cool and peel.','Season the chicken with a pinch of salt and sear in sesame oil until browned and cooked through, 5 to 6 minutes per side. Rest, then slice.','Simmer the broth with garlic, ginger, sake, mirin and dashi for 10 minutes. Add salt to taste. Shio broth should be clear and lightly salty.','Cook the noodles as the package says. Wilt the spinach in the hot broth for 30 seconds.','Divide noodles into bowls, ladle broth over, and top with chicken, spinach, fish cake, halved eggs and green onions. Serve with lemon wedges.']},
+{id:'b-quickramen',name:'Quick weeknight chicken ramen',time:20,serv:4,tags:['japanese','quick','budget','kid-favorite'],ing:[
+[4,'piece','Instant ramen noodles (block, no seasoning)','skip the flavor packets'],[1,'tbsp','Sesame oil'],[3,'clove','Garlic','minced'],[1,'tbsp','Ginger, fresh','grated'],[7,'cup','Chicken broth'],[3,'tbsp','Soy sauce'],[1,'tbsp','Miso paste'],[3,'cup','Stir-fry vegetables, frozen'],[400,'g','Rotisserie chicken meat','shredded'],[4,'piece','Eggs'],[4,'stalk','Green onions','sliced'],[1,'tbsp','Sriracha','optional']],
+steps:['Warm the sesame oil in a large pot and cook the garlic and ginger for 1 minute.','Add the broth, soy sauce and miso and bring to a boil.','Add the frozen vegetables and noodles (without the flavor packets) and cook 3 minutes.','Stir in the chicken. Crack the eggs into the simmering broth and cook 3 minutes until just set.','Ladle into bowls and top with green onions and sriracha.']},
+{id:'b-tinga',name:'Chicken tinga tostadas',time:40,serv:4,tags:['mexican','kid-favorite'],ing:[
+[800,'g','Chicken breast, boneless skinless'],[1,'tbsp','Vegetable oil'],[1,'piece','Onion','thinly sliced'],[3,'clove','Garlic','minced'],[3,'piece','Tomatoes','chopped'],[2,'piece','Chipotle peppers in adobo','plus 1 tbsp sauce; use less for milder'],[0.5,'cup','Chicken broth'],[1,'tsp','Dried oregano'],[12,'piece','Tostada shells, corn'],[1,'can','Refried beans, canned'],[3,'cup','Romaine lettuce','shredded'],[0.5,'cup','Sour cream'],[0.75,'cup','Queso fresco / kesong puti','crumbled'],[1,'piece','Avocado','sliced']],
+steps:['Simmer the chicken in salted water for 15 to 18 minutes until cooked through. Shred with two forks.','Cook the onion in oil until soft, about 5 minutes. Add the garlic for 1 minute.','Blend the tomatoes, chipotles with sauce, broth and oregano until smooth. Pour into the pan and simmer 5 minutes.','Stir in the chicken and simmer 5 more minutes until saucy.','Warm the beans. Spread beans on each tostada, then top with chicken tinga, lettuce, sour cream, queso fresco and avocado.']},
+{id:'b-pozole',name:'Pozole rojo (pork and hominy stew)',time:120,serv:4,tags:['mexican','stew','make-ahead'],ing:[
+[900,'g','Pork shoulder (kasim)','cut in 5 cm chunks'],[8,'cup','Chicken broth'],[1,'piece','Onion','halved'],[6,'clove','Garlic'],[1.5,'tsp','Salt'],[5,'piece','Guajillo chiles, dried','stems and seeds removed'],[2,'piece','Ancho chiles, dried','stems and seeds removed'],[2,'tsp','Dried oregano'],[1,'tsp','Ground cumin'],[2,'can','Hominy, canned','drained and rinsed'],[2,'cup','Cabbage','finely shredded'],[6,'piece','Red radishes','thinly sliced'],[2,'piece','Limes','cut in wedges'],[8,'piece','Tostada shells, corn','to serve']],
+steps:['Put the pork, half the onion, 4 garlic cloves, the salt and the broth in a large pot. Bring to a boil, skim, then simmer 1½ hours until tender.','Meanwhile toast the dried chiles in a dry pan for 30 seconds per side, then soak in 2 cups hot water for 20 minutes.','Blend the chiles with 1 cup of the soaking water, the rest of the onion and garlic, the oregano and the cumin until smooth.','Strain the chile sauce into the pot, add the hominy and simmer 20 minutes. Taste for salt.','Slow cooker option: cook the pork, broth, onion, garlic and chile sauce on Low 8h or High 4h, then add the hominy for the last 30 minutes.','Serve in bowls topped with cabbage, radishes and a squeeze of lime, with tostadas on the side.']},
+{id:'b-enchiladasverdes',name:'Chicken enchiladas verdes',time:50,serv:4,tags:['mexican'],ing:[
+[700,'g','Tomatillos','husked and rinsed'],[2,'piece','Jalapeño','stems removed'],[1,'piece','Onion','half in chunks, half diced'],[3,'clove','Garlic'],[0.5,'cup','Cilantro'],[0.5,'cup','Chicken broth'],[600,'g','Rotisserie chicken meat','shredded'],[1,'tbsp','Vegetable oil'],[12,'piece','Corn tortillas'],[1.5,'cup','Monterey Jack cheese','shredded'],[0.5,'cup','Sour cream'],[1,'can','Pinto beans, cooked or canned','to serve']],
+steps:['Heat the oven to 200°C / 400°F.','Boil the tomatillos, jalapeños, onion chunks and garlic in water for 10 minutes, until the tomatillos turn olive green.','Drain and blend with the cilantro, broth and a big pinch of salt to make the salsa verde.','Mix the chicken with the diced onion and 1 cup of the salsa. Brush the tortillas with oil and warm them so they bend, then fill, roll and set seam-side down in a baking dish.','Pour the rest of the salsa over, top with cheese and bake 15 to 20 minutes until bubbly.','Drizzle with sour cream and serve with warm pinto beans.']},
+{id:'b-mole',name:'Chicken mole with rice',time:50,serv:4,tags:['mexican'],ing:[
+[900,'g','Chicken thigh, boneless skinless'],[1,'tbsp','Vegetable oil'],[0.5,'cup','Mole paste, jarred'],[3,'cup','Chicken broth'],[1,'tbsp','Brown sugar','optional'],[0.5,'piece','Onion','diced'],[2,'clove','Garlic','minced'],[1.5,'cup','White rice, uncooked'],[2.5,'cup','Water'],[1,'tbsp','Sesame seeds','toasted'],[8,'piece','Corn tortillas','warmed']],
+steps:['Season the chicken with salt and brown it in oil, about 4 minutes per side. Set aside.','In the same pan, stir the mole paste with a splash of broth over low heat until it loosens, then whisk in 2½ cups broth until smooth.','Return the chicken to the sauce, cover and simmer 20 minutes until tender. Add the brown sugar if the sauce tastes bitter.','Meanwhile cook the onion and garlic in a saucepan for 2 minutes, add the rice, the last ½ cup broth and the water, and cook covered for 18 minutes.','Serve the chicken and sauce over rice, sprinkled with sesame seeds, with warm tortillas.']},
+{id:'b-chilesrellenos',name:'Baked chiles rellenos with beef and cheese',time:55,serv:4,tags:['mexican'],ing:[
+[8,'piece','Poblano pepper'],[450,'g','Ground beef 90/10'],[1,'piece','Onion','diced'],[3,'clove','Garlic','minced'],[1,'tsp','Ground cumin'],[1,'tsp','Dried oregano'],[1.5,'cup','Monterey Jack cheese','shredded'],[1,'can','Tomato sauce'],[1,'piece','Chipotle peppers in adobo','minced, optional'],[1,'cup','White rice, uncooked','to serve'],[1,'can','Black beans, cooked or canned','to serve']],
+steps:['Char the poblanos under the broiler or over a gas flame, turning, until blistered all over. Steam in a covered bowl for 10 minutes, then peel. Slit each one and remove the seeds.','Heat the oven to 200°C / 400°F and start the rice.','Brown the beef with the onion, garlic, cumin and oregano. Stir in 1 cup of the cheese.','Fill each pepper with the beef mixture and lay them in a baking dish.','Stir the chipotle into the tomato sauce, pour it around the peppers and top with the rest of the cheese.','Bake 15 to 20 minutes until bubbly. Serve with the rice and warm black beans.']},
+{id:'b-albondigas',name:'Sopa de albóndigas (Mexican meatball soup)',time:60,serv:4,tags:['mexican','budget'],ing:[
+[700,'g','Ground beef 90/10'],[0.33,'cup','White rice, uncooked'],[1,'piece','Eggs'],[1,'piece','Onion','finely diced'],[3,'clove','Garlic','minced'],[1,'tsp','Ground cumin'],[1,'tsp','Dried oregano'],[1,'tsp','Salt'],[8,'cup','Chicken broth'],[1,'cup','Tomato sauce'],[2,'piece','Potatoes','diced'],[3,'piece','Carrots','sliced'],[2,'piece','Zucchini','chopped'],[0.5,'cup','Cilantro','chopped'],[2,'piece','Limes','cut in wedges'],[8,'piece','Corn tortillas','warmed']],
+steps:['Mix the beef, uncooked rice, egg, half the onion, half the garlic, the cumin, oregano and salt. Roll into about 24 walnut-size meatballs.','In a large pot, soften the rest of the onion and garlic, then add the broth and tomato sauce and bring to a boil.','Drop in the meatballs, potatoes and carrots. Cover and simmer 25 minutes.','Add the zucchini and simmer 10 minutes more, until the meatballs are cooked and the rice inside is tender.','Stir in the cilantro. Serve with lime wedges and warm tortillas.']},
+{id:'b-beefstew',name:'Classic beef stew',time:255,serv:4,tags:['stew','slow-cooker','make-ahead'],ing:[
+[900,'g','Beef stew meat'],[3,'tbsp','All-purpose flour'],[1,'tsp','Salt'],[0.5,'tsp','Black pepper'],[2,'tbsp','Vegetable oil'],[1,'piece','Onion','chopped'],[3,'clove','Garlic','minced'],[4,'piece','Potatoes','2 cm cubes'],[4,'piece','Carrots','thick slices'],[2,'stalk','Celery','sliced'],[2,'tbsp','Tomato paste'],[1,'tbsp','Worcestershire sauce'],[4,'cup','Beef broth'],[1,'tsp','Dried thyme'],[2,'piece','Bay leaves'],[1,'cup','Peas, frozen']],
+steps:['Toss the beef with the flour, salt and pepper. Brown it in oil in batches; this adds a lot of flavor.','Slow cooker: put the beef, onion, garlic, potatoes, carrots and celery in the cooker. Whisk the tomato paste and Worcestershire into the broth and pour it over. Add the thyme and bay leaves.','Cook on Low 8h or High 4h, until the beef is fork-tender.','Stovetop instead: simmer covered in a heavy pot for about 2 hours, adding the vegetables after the first hour.','Stir in the peas for the last 10 minutes. Remove the bay leaves and taste for salt.']},
+{id:'b-potroast',name:'Slow cooker pot roast with vegetables',time:315,serv:4,tags:['slow-cooker','kid-favorite','make-ahead'],ing:[
+[1200,'g','Beef chuck roast'],[1,'tsp','Salt'],[0.5,'tsp','Black pepper'],[1,'tbsp','Vegetable oil'],[700,'g','Red potatoes','halved'],[5,'piece','Carrots','big chunks'],[1,'piece','Onion','cut in wedges'],[4,'clove','Garlic'],[1.5,'cup','Beef broth'],[2,'tbsp','Worcestershire sauce'],[1,'tbsp','Tomato paste'],[1,'tsp','Dried thyme'],[2,'tbsp','Cornstarch','for the gravy']],
+steps:['Season the roast with salt and pepper and sear it in oil on all sides until browned, about 8 minutes.','Put the potatoes, carrots, onion and garlic in the slow cooker and set the roast on top.','Whisk the broth, Worcestershire, tomato paste and thyme and pour it over.','Cook on Low 8 to 9h or High 5h, until the beef pulls apart easily.','Move the meat and vegetables to a platter. Whisk the cornstarch with 3 tablespoons cold water, stir it into the cooking liquid and cook on High for 10 minutes to thicken into gravy.']},
+{id:'b-whitechili',name:'Slow cooker white chicken chili',time:255,serv:4,tags:['slow-cooker','stew','make-ahead'],ing:[
+[900,'g','Chicken breast, boneless skinless'],[2,'can','Cannellini / white beans, cooked or canned','drained'],[1,'can','Green chiles, canned'],[1,'piece','Onion','diced'],[3,'clove','Garlic','minced'],[1,'piece','Jalapeño','diced'],[1.5,'tsp','Ground cumin'],[1,'tsp','Dried oregano'],[4,'cup','Chicken broth'],[1,'cup','Corn, frozen'],[120,'g','Cream cheese','cubed'],[1,'piece','Limes','juiced'],[0.5,'cup','Cilantro','chopped'],[1,'cup','Monterey Jack cheese','shredded, to serve'],[2,'cup','Tortilla chips','to serve']],
+steps:['Put the chicken, beans, green chiles, onion, garlic, jalapeño, cumin, oregano and broth in the slow cooker.','Cook on Low 6 to 7h or High 3½ to 4h, until the chicken shreds easily.','Shred the chicken in the pot with two forks. Stir in the corn and cream cheese and cook 20 minutes more until creamy.','Add the lime juice and cilantro. Serve topped with cheese and a few tortilla chips.']},
+{id:'b-jpcurry',name:'Japanese curry stew with chicken',time:50,serv:4,tags:['japanese','stew','kid-favorite'],ing:[
+[800,'g','Chicken thigh, boneless skinless','bite-size pieces'],[1,'tbsp','Vegetable oil'],[2,'piece','Onion','sliced'],[3,'piece','Carrots','chunks'],[3,'piece','Potatoes','chunks'],[1,'tbsp','Ginger, fresh','grated'],[2,'clove','Garlic','grated'],[4,'cup','Water'],[100,'g','Japanese curry roux','about half a 200 g box'],[1,'tbsp','Honey','optional'],[1.5,'cup','White rice, uncooked','to serve']],
+steps:['Brown the chicken in oil, then add the onions and cook until soft, about 6 minutes.','Add the carrots, potatoes, ginger and garlic, then the water. Bring to a boil, skim, and simmer 20 minutes until the potatoes are tender.','Turn off the heat and stir in the curry roux until it melts. Simmer 5 more minutes, stirring, until thick. Add the honey if you like it sweeter.','Slow cooker option: cook everything except the roux on Low 6h or High 3h, then stir in the roux and cook 30 minutes on High.','Serve over hot rice.']},
+{id:'b-splitpea',name:'Slow cooker split pea soup with ham',time:255,serv:4,tags:['slow-cooker','stew','budget'],ing:[
+[450,'g','Split peas, dry','rinsed'],[400,'g','Ham, sliced','diced'],[1,'piece','Onion','diced'],[3,'piece','Carrots','diced'],[2,'stalk','Celery','diced'],[3,'clove','Garlic','minced'],[1,'tsp','Dried thyme'],[2,'piece','Bay leaves'],[6,'cup','Chicken broth'],[2,'cup','Water'],[0.5,'tsp','Black pepper'],[8,'slice','Whole wheat bread','to serve']],
+steps:['Put everything except the bread in the slow cooker. Hold off on salt; the ham is salty.','Cook on Low 8h or High 4 to 5h, until the peas break down.','Remove the bay leaves and stir well, or blend part of the soup for a smoother texture.','Taste for salt and serve with toast or bread.']},
+{id:'b-barbacoa',name:'Slow cooker beef barbacoa',time:315,serv:4,tags:['mexican','slow-cooker','kid-favorite'],ing:[
+[1200,'g','Beef chuck roast','cut in 4 big pieces'],[3,'piece','Chipotle peppers in adobo','plus 2 tbsp sauce'],[0.25,'cup','Lime juice'],[2,'tbsp','Vinegar'],[5,'clove','Garlic'],[1,'piece','Onion','quartered'],[2,'tsp','Ground cumin'],[2,'tsp','Dried oregano'],[1,'tsp','Salt'],[0.5,'cup','Beef broth'],[3,'piece','Bay leaves'],[12,'piece','Corn tortillas'],[0.5,'piece','Red onion','finely diced'],[0.5,'cup','Cilantro','chopped'],[2,'piece','Limes','cut in wedges']],
+steps:['Blend the chipotles with their sauce, the lime juice, vinegar, garlic, onion, cumin, oregano, salt and broth until smooth.','Put the beef in the slow cooker, pour the sauce over and tuck in the bay leaves.','Cook on Low 8h or High 5h, until the beef shreds easily.','Shred the beef in the juices and let it soak for 10 minutes.','Serve in warm tortillas with red onion, cilantro and lime.']},
+{id:'b-salsaverdechicken',name:'Crock pot salsa verde chicken bowls',time:255,serv:4,tags:['mexican','slow-cooker','budget'],ing:[
+[1000,'g','Chicken thigh, boneless skinless'],[2,'cup','Salsa verde, jarred'],[1,'piece','Onion','sliced'],[3,'clove','Garlic'],[1,'tsp','Ground cumin'],[1,'tsp','Salt'],[1.5,'cup','White rice, uncooked'],[1,'can','Black beans, cooked or canned'],[1,'cup','Corn, frozen'],[1,'piece','Avocado','sliced'],[0.5,'cup','Sour cream'],[0.5,'cup','Cilantro'],[1,'piece','Limes','cut in wedges']],
+steps:['Put the chicken, onion, garlic, cumin and salt in the slow cooker and pour the salsa verde over.','Cook on Low 6h or High 3½ to 4h.','Shred the chicken in the sauce.','Cook the rice and warm the beans and corn.','Build bowls with rice, chicken and sauce, beans, corn, avocado, sour cream, cilantro and a squeeze of lime.']},
+{id:'b-pulledpork',name:'Slow cooker BBQ pulled pork sandwiches',time:375,serv:4,tags:['slow-cooker','kid-favorite','make-ahead'],ing:[
+[1000,'g','Pork shoulder (kasim)','trim the thickest fat'],[1,'tbsp','Brown sugar'],[2,'tsp','Paprika'],[1,'tsp','Garlic powder'],[1,'tsp','Salt'],[1,'piece','Onion','sliced'],[0.5,'cup','Chicken broth'],[1,'cup','BBQ sauce'],[3,'tbsp','Vinegar','2 for the pork, 1 for the slaw'],[6,'piece','Hamburger buns'],[4,'cup','Coleslaw mix'],[3,'tbsp','Mayonnaise']],
+steps:['Rub the pork with the brown sugar, paprika, garlic powder and salt.','Lay the onion in the slow cooker, set the pork on top and pour in the broth.','Cook on Low 8 to 10h or High 5 to 6h, until it shreds easily.','Pour off most of the liquid, shred the pork and stir in the BBQ sauce and 2 tablespoons vinegar.','Toss the coleslaw mix with the mayonnaise and the last tablespoon of vinegar. Serve the pork on buns with the slaw.']}
 ];
 
 'use strict';
@@ -605,15 +656,16 @@ function fmtRange(days){const a=parseISO(days[0]),b=parseISO(days[6]);return MON
 function dayTitle(d){const x=parseISO(d);return WD[x.getDay()]+', '+MON[x.getMonth()]+' '+x.getDate()}
 function recentlyUsed(id,ws){ws=ws||curWeek;const from=iso(addDays(parseISO(ws),-14)),to=iso(addDays(parseISO(ws),6));
  return Object.keys(plan).some(d=>d>=from&&d<=to&&plan[d]&&plan[d].kind==='meal'&&plan[d].meal===id)}
-const TAGS={filipino:'Filipino','tex-mex':'Tex-Mex',budget:'Budget','kid-favorite':'Kid favorite','make-ahead':'Make-ahead','one-pan':'One pan',quick:'Quick'};
+const TAGS={japanese:'Japanese',mexican:'Mexican','tex-mex':'Tex-Mex',stew:'Stew','slow-cooker':'Slow cooker',filipino:'Filipino',budget:'Budget','kid-favorite':'Kid favorite','make-ahead':'Make-ahead','one-pan':'One pan',quick:'Quick'};
 const GOALS={
  hp:{label:'High protein',test:(m,mm)=>mm.per.p>=45},
  lc:{label:'Low carb',test:(m,mm)=>mm.per.c<=25},
  quick:{label:'Under 30 min',test:m=>(+m.time||99)<=30},
  budget:{label:'Budget',test:m=>(m.tags||[]).includes('budget')},
  fresh:{label:'Not in last 2 weeks',test:m=>!recentlyUsed(m.id)},
- fil:{label:'Filipino',test:m=>(m.tags||[]).includes('filipino')},
- tex:{label:'Tex-Mex',test:m=>(m.tags||[]).includes('tex-mex')},
+ jp:{label:'Japanese',test:m=>(m.tags||[]).includes('japanese')},
+ tex:{label:'Mexican',test:m=>(m.tags||[]).some(t=>t==='mexican'||t==='tex-mex')},
+ slow:{label:'Stews and slow cooker',test:m=>(m.tags||[]).some(t=>t==='stew'||t==='slow-cooker')},
  kid:{label:'Kid favorite',test:m=>(m.tags||[]).includes('kid-favorite')}};
 function rankMeals(gs){const list=allMeals().map(m=>({m,mm:mealMacros(m)})).filter(x=>gs.every(g=>GOALS[g]&&GOALS[g].test(x.m,x.mm)));
  list.forEach(x=>{const p=x.mm.per;let s=0;
@@ -621,6 +673,18 @@ function rankMeals(gs){const list=allMeals().map(m=>({m,mm:mealMacros(m)})).filt
   if(!gs.includes('hp')&&!gs.includes('lc'))s+=p.kcal?p.p*400/p.kcal:0;
   if(recentlyUsed(x.m.id))s-=25;x.score=s});
  return list.sort((a,b)=>b.score-a.score||a.m.name.localeCompare(b.m.name))}
+
+// ---------- v3 migration: Filipino built-ins were removed from the library ----------
+const REMOVED_MEALS={'b-adobo':'Chicken adobo','b-tinola':'Chicken tinola','b-sinigang':'Pork sinigang','b-pancit':'Pancit bihon','b-bistek':'Bistek Tagalog','b-giniling':'Pork giniling','b-monggo':'Ginisang monggo','b-inasal':'Chicken inasal','b-afritada':'Chicken afritada','b-torta':'Tortang talong','b-arrozcaldo':'Arroz caldo','b-curry':'Filipino chicken curry'};
+let migrateMsg='';
+(function migrateRemoved(){const today=iso(new Date());let cleared=0,changed=false;
+ for(const d in plan){const e=plan[d];if(e&&e.kind==='meal'&&REMOVED_MEALS[e.meal]&&!myMeals.some(m=>m.id===e.meal)){
+  if(d>=today){delete plan[d];cleared++;changed=true}else if(!e.removedName){e.removedName=REMOVED_MEALS[e.meal];changed=true}}}
+ if(changed)savePlan();
+ const h=settings.hidden.filter(id=>!REMOVED_MEALS[id]);if(h.length!==settings.hidden.length){settings.hidden=h;saveSettings()}
+ const g=goals.filter(x=>GOALS[x]);if(g.length!==goals.length){goals=g;save(K.goals,goals)}
+ if(cleared)migrateMsg=`The Filipino dinners were removed from the library. ${cleared} planned night${cleared===1?' is':'s are'} open again.`})();
+function removedName(e){return e&&(e.removedName||REMOVED_MEALS[e.meal])||''}
 
 // ---------- view plumbing ----------
 let view={name:'plan',arg:null};
@@ -645,7 +709,7 @@ function renderPlan(){header('Dinner plan');tabs('plan');const days=weekDays(cur
   if(!e)body='<div class="dim">Nothing planned. Tap to choose.</div>';
   else if(e.kind==='left')body=`<div class="t2">Leftovers</div>${e.note?`<div class="dim small">${esc(e.note)}</div>`:''}`;
   else if(e.kind==='out')body=`<div class="t2">Eating out</div>${e.note?`<div class="dim small">${esc(e.note)}</div>`:''}`;
-  else{const m=mealById(e.meal);if(!m)body='<div class="dim">This meal was deleted. Tap to choose another.</div>';
+  else{const m=mealById(e.meal);if(!m)body=removedName(e)?`<div class="t2">${esc(removedName(e))}</div><div class="dim small">No longer in the meal library.</div>`:'<div class="dim">This meal was deleted. Tap to choose another.</div>';
    else body=`<div class="t2">${esc(m.name)}</div><div class="dim small">${mealMeta(m)} per serving</div><div class="row" style="margin-top:8px"><span class="dim small grow">Servings</span><button class="step" data-a="nserv" data-v="${d}" data-d="-1" aria-label="Fewer servings">−</button><b class="sv">${e.serv}</b><button class="step" data-a="nserv" data-v="${d}" data-d="1" aria-label="More servings">+</button></div>`}
   h+=`<div class="card day${d===today?' today':''}" data-a="day" data-v="${d}" role="button" tabindex="0"><div class="dlabel">${WD[dt.getDay()]} <span class="dim">${MON[dt.getMonth()]} ${dt.getDate()}</span>${d===today?'<span class="tag">Today</span>':''}</div>${body}</div>`});
  h+=summaryHTML(days);
@@ -681,7 +745,7 @@ function setNight(d,mealId,serv){plan[d]={kind:'meal',meal:mealId,serv:serv||set
 
 // ---------- meals ----------
 let mealFilter='all',mealQ='';
-const MFILTERS=[['all','All'],['mine','My meals'],['fil','Filipino'],['tex','Tex-Mex'],['quick','Under 30 min'],['hp','High protein'],['lc','Low carb'],['budget','Budget'],['kid','Kid favorite']];
+const MFILTERS=[['all','All'],['mine','My meals'],['jp','Japanese'],['tex','Mexican'],['slow','Stews and slow cooker'],['quick','Under 30 min'],['hp','High protein'],['lc','Low carb'],['budget','Budget'],['kid','Kid favorite']];
 function renderMeals(){header('Meals');tabs('meals');
  $('#app').innerHTML=`${mealDraft?'<button class="full" data-a="resumedraft" style="margin-bottom:8px">Continue the meal you were adding</button>':''}<button class="pri full" data-a="newmeal">+ Add my own meal</button>
  <input id="mq" type="search" placeholder="Search meals" value="${esc(mealQ)}" style="margin-top:12px" autocomplete="off">
@@ -709,19 +773,19 @@ function renderMeal(arg){const m=mealById(arg.id);if(!m)return go('meals');
  $('#app').innerHTML=h}
 function renderPlanPick(mid){const m=mealById(mid);if(!m)return go('meals');header('Plan: '+m.name,()=>go('meal',{id:mid}));tabs('meals');
  let h=weekNav('pwk')+'<p class="dim small" style="margin-top:0">Tap a night to put this meal there.</p><div class="list">';
- weekDays(curWeek).forEach(d=>{const e=plan[d];const cur=!e?'Open':e.kind==='left'?'Leftovers':e.kind==='out'?'Eating out':(mealById(e.meal)||{name:'Deleted meal'}).name;
+ weekDays(curWeek).forEach(d=>{const e=plan[d];const cur=!e?'Open':e.kind==='left'?'Leftovers':e.kind==='out'?'Eating out':(mealById(e.meal)||{name:removedName(e)||'Deleted meal'}).name;
   h+=`<button data-a="putmeal" data-v="${d}"><b>${dayTitle(d)}</b><div class="small ${e?'dim':'okc'}">${esc(cur)}</div></button>`});
  $('#app').innerHTML=h+'</div>'}
 
 // ---------- add / edit my own meal ----------
-const EDIT_TAGS=['filipino','tex-mex','budget','kid-favorite','make-ahead','one-pan'];
+const EDIT_TAGS=['japanese','mexican','tex-mex','stew','slow-cooker','budget','kid-favorite','make-ahead','one-pan'];
 function newDraft(src){if(src)return {id:src.builtin?null:src.id,name:src.builtin?src.name+' (my version)':src.name,serv:src.serv,time:src.time||'',tags:(src.tags||[]).slice(),ing:clone(src.ing),steps:(src.steps||[]).join('\n')};
  return {id:null,name:'',serv:settings.servings,time:'',tags:[],ing:[{q:'',u:'g',n:'',note:''},{q:'',u:'g',n:'',note:''},{q:'',u:'g',n:'',note:''}],steps:''}}
 function renderEdit(){const D=mealDraft;if(!D)return go('meals');
  header(D.id?'Edit meal':'Add my own meal',()=>{if(confirm('Leave without saving? Your changes will be lost.')){mealDraft=null;saveDraft();go('meals')}});tabs('meals');
  let h=`<label class="f" for="ename">Meal name</label><input id="ename" data-ef="name" value="${esc(D.name)}" placeholder="e.g. Clint's chicken stir-fry">
  <div class="row"><div class="grow"><label class="f" for="eserv">Recipe makes (servings)</label><input id="eserv" data-ef="serv" inputmode="numeric" value="${esc(D.serv)}"></div><div class="grow"><label class="f" for="etime">Total time (minutes)</label><input id="etime" data-ef="time" inputmode="numeric" value="${esc(D.time)}"></div></div>
- <label class="f">Tags</label><div class="chips">${EDIT_TAGS.map(t=>`<button class="chip${D.tags.includes(t)?' on':''}" data-a="etag" data-v="${t}">${TAGS[t]}</button>`).join('')}</div>
+ <label class="f">Tags</label><div class="chips">${EDIT_TAGS.concat(D.tags.filter(t=>!EDIT_TAGS.includes(t)&&TAGS[t])).map(t=>`<button class="chip${D.tags.includes(t)?' on':''}" data-a="etag" data-v="${t}">${TAGS[t]}</button>`).join('')}</div>
  <h2>Ingredients</h2><p class="dim small" style="margin-top:0">Start typing an ingredient and pick from the list so macros can be estimated.</p><div id="ingrows">`;
  D.ing.forEach((x,i)=>{h+=ingRowHTML(x,i)});
  h+=`</div><div class="row" style="margin-top:8px"><button class="grow" data-a="eadd">+ Add ingredient</button><button class="grow" data-a="epaste">Paste a list</button></div>
@@ -786,7 +850,7 @@ function renderIdeas(){header('Meal ideas');tabs('ideas');const ranked=rankMeals
  <label class="f" for="vx">Main ingredient (optional)</label><input id="vx" placeholder="e.g. chicken thighs, ground beef, tilapia">
  <button class="full" data-a="vitals" style="margin-top:10px">Ask Vitals for a new recipe</button><div id="copyout"></div></div>`;
  $('#app').innerHTML=h}
-function vitalsPrompt(x){const GL={hp:'high protein',lc:'low carb',quick:'ready in under 30 minutes',budget:'budget-friendly',fil:'Filipino style',tex:'Tex-Mex style',kid:'something teenagers will love'};const gl=goals.filter(g=>GL[g]).map(g=>GL[g]);
+function vitalsPrompt(x){const GL={hp:'high protein',lc:'low carb',quick:'ready in under 30 minutes',budget:'budget-friendly',jp:'Japanese style, like ramen or curry',tex:'Mexican or Tex-Mex style',slow:'a stew or slow cooker meal',kid:'something teenagers will love'};const gl=goals.filter(g=>GL[g]).map(g=>GL[g]);
  return `Give me a dinner recipe for 4 people (two adults and two teenage boys with big appetites)${x?' using '+x:''}${gl.length?'. Goals: '+gl.join(', '):''}. Include prep and cook time, step-by-step instructions, and estimated macros per serving (calories, protein, carbs, fat, fiber). List the ingredients one per line with amounts first, like "500 g chicken breast" or "2 tbsp soy sauce", so I can paste them into my meal planner. We live in Manila, so use ingredients I can find there.`}
 function autofill(){const days=weekDays(curWeek).filter(d=>!plan[d]);if(!days.length){toast('No empty nights this week');return 0}
  const inWeek=new Set(weekDays(curWeek).map(d=>plan[d]).filter(e=>e&&e.kind==='meal').map(e=>e.meal));
@@ -849,7 +913,7 @@ function renderSettings(){header('Settings');tabs('settings');
  <label class="f" for="impfile">Import from file</label><input type="file" id="impfile" accept=".json,application/json,text/plain">
  <label class="f" for="imptext">Or paste JSON</label><textarea id="imptext" rows="3"></textarea>
  <button class="full" data-a="importtext" style="margin-top:8px">Import pasted JSON</button>
- <h2>About the macros</h2><p class="small dim" style="margin-top:0">Macros are estimates. Each ingredient is converted to grams (using typical weights for cups, pieces, cans and cloves) and multiplied by standard per-100 g values based on USDA FoodData Central. A few local items (like longganisa, tocino and sinigang mix) use typical label values. Raw weights are used for meat and dry weights for rice and pasta.</p>
+ <h2>About the macros</h2><p class="small dim" style="margin-top:0">Macros are estimates. Each ingredient is converted to grams (using typical weights for cups, pieces, cans and cloves) and multiplied by standard per-100 g values based on USDA FoodData Central. A few store-bought items (like ramen noodles, curry roux and mole paste) use typical label values. Raw weights are used for meat and dry weights for rice and pasta.</p>
  <h2>Add to Home Screen</h2><p class="small dim" style="margin-top:0">In Safari, tap Share, then Add to Home Screen. It works offline after the first visit.</p>
  <h2>Reset</h2><button class="danger full" data-a="reset">Erase all data</button>`;
  $('#app').innerHTML=h;
@@ -953,7 +1017,7 @@ document.addEventListener('change',ev=>{if(ev.target.tagName==='SELECT')onEditIn
 
 // ---------- offline ----------
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
-render();
+render();if(migrateMsg)setTimeout(()=>toast(migrateMsg),300);
 
 // If the phone kept the app open across a rollover, move to the new active week (only if he hadn't navigated away).
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;const aw=activeWeek();if(aw!==lastActive){if(curWeek===lastActive&&['plan','shop','ideas'].includes(view.name)){curWeek=aw;lastActive=aw;render()}else lastActive=aw}});
