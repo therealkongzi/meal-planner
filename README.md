@@ -4,6 +4,7 @@ A single-file, offline web app for planning a family's weekly dinners (4 people)
 
 - **Plan:** 7 nights per week (start day set in Settings; from the shopping day, default Saturday, until the week rolls over it opens on the coming week), leftovers / eating-out nights, per-night servings.
 - **Meals:** 50 built-in family dinners, including Japanese ramen and curry, Mexican and Tex-Mex, and stews and slow cooker meals, plus your own meals with macro estimates.
+- **Favorites:** star a meal to keep it, then use the Favorites filter on the Meals tab. Stars are saved on this phone with the rest of your data.
 - **Macros:** estimated from an embedded table of 298 common ingredients (per 100 g, based on USDA FoodData Central standard values) with unit conversions.
 - **Shopping list:** generated from the week's plan, combined and grouped by store section; manual items are kept when it is remade.
 - **Ideas:** filter and rank by goal, auto-fill empty nights, and copy a recipe request for a health-coach chat.
